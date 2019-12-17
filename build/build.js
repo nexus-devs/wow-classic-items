@@ -93,11 +93,14 @@ class Build {
     }
 
     const items = []
-    for (const item of input) {
+
+    // Fetch function so we can parallelize it
+    const fetchItem = async (item) => {
       const req = await request({
         url: `https://us.api.blizzard.com/data/wow/item/${item.itemId}?namespace=static-classic-us&locale=en_US&access_token=${this.blizzardToken}`,
         json: true
       })
+
       const res = req.body
 
       // Catch unknown error codes or sanitize input if known
@@ -105,7 +108,7 @@ class Build {
         if (res.detail !== 'Not Found') {
           this.warn(`Unknown Blizzard Error with code ${res.code} on item ${item.itemId}: ${res.detail}`)
         }
-        continue
+        return
       }
 
       // Update item with basic desc
@@ -121,8 +124,19 @@ class Build {
       else if (res.inventory_type.type === 'RANGEDRIGHT') item.slot = 'Ranged' // Catch weird edge case
 
       items.push(item)
+    }
 
-      break
+    let parallel = []
+    const batchSize = 100 // Blizzard throttling limit is 100/s
+    const progress = new ProgressBar('Fetching item descriptions', input.length / batchSize)
+    for (let i = 0; i < input.length; i++) {
+      const item = input[i]
+      parallel.push(fetchItem(item))
+      if (parallel.length >= batchSize || i === input.length - 1) {
+        await Promise.all(parallel)
+        progress.tick()
+        parallel = []
+      }
     }
 
     return items
@@ -152,4 +166,4 @@ class Build {
 
 const build = new Build()
 // build.start()
-build.step('item_desc', false, 'tmp/base_items.json')
+build.step('item_desc', 'tmp/extended_items.json', 'tmp/base_items.json')
