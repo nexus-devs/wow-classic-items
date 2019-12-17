@@ -15,7 +15,7 @@ class Build {
       this.blizzardToken = fs.readFileSync(`${__dirname}/../${blizzardToken}`, 'utf8').trim()
     } catch (err) {
       if (err.code !== 'ENOENT') throw err // Don't throw error if file simply doesn't exist
-      else console.log(`${colors.yellow('Warning')}: Blizzard Token could not be found.`)
+      else this.warn('Blizzard Token could not be found')
     }
   }
 
@@ -92,14 +92,40 @@ class Build {
       return input
     }
 
+    const items = []
     for (const item of input) {
       const req = await request({
         url: `https://us.api.blizzard.com/data/wow/item/${item.itemId}?namespace=static-classic-us&locale=en_US&access_token=${this.blizzardToken}`,
         json: true
       })
-      console.log(req.body)
+      const res = req.body
+
+      // Catch unknown error codes or sanitize input if known
+      if (res.code) {
+        if (res.detail !== 'Not Found') {
+          this.warn(`Unknown Blizzard Error with code ${res.code} on item ${item.itemId}: ${res.detail}`)
+        }
+        continue
+      }
+
+      // Update item with basic desc
+      item.class = res.item_class.name
+      item.subclass = res.item_subclass.name
+      item.sellPrice = res.sell_price
+      item.quality = res.quality.name
+      item.itemLevel = res.level
+      item.requiredLevel = res.required_level
+
+      // Add slot if item can be equipped
+      if (res.inventory_type.hasOwnProperty('name')) item.slot = res.inventory_type.name
+      else if (res.inventory_type.type === 'RANGEDRIGHT') item.slot = 'Ranged' // Catch weird edge case
+
+      items.push(item)
+
       break
     }
+
+    return items
   }
 
   /**
@@ -114,6 +140,13 @@ class Build {
    */
   readJSON (fileName) {
     return JSON.parse(fs.readFileSync(`${__dirname}/../data/${fileName}`, 'utf8'))
+  }
+
+  /**
+   * Cosmetic function for build warnings
+   */
+  warn (message) {
+    console.log(`${colors.yellow('Warning')}: ${message}`)
   }
 }
 
