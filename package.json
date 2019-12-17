@@ -4,6 +4,7 @@
   "description": "Collection of all WoW Classic items.",
   "main": "index.js",
   "scripts": {
+    "build": "node ./build/build.js",
     "test": "echo \"Error: no test specified\" && exit 1",
     "lint": "eslint --ignore-path .gitignore ."
   },
@@ -15,6 +16,7 @@
     "eslint-plugin-import": "^2.19.1",
     "eslint-plugin-node": "^10.0.0",
     "eslint-plugin-promise": "^4.2.1",
-    "eslint-plugin-standard": "^4.0.1"
+    "eslint-plugin-standard": "^4.0.1",
+    "requestretry": "^4.0.2"
   }
 }
