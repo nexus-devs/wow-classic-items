@@ -2,12 +2,21 @@ const request = require('requestretry')
 const cheerio = require('cheerio')
 const ProgressBar = require('./progress')
 const fs = require('fs')
+const colors = require('colors/safe')
 
 class Build {
-  constructor() {
+  constructor(blizzardToken = 'blizzard_token') {
     this.pipeline = [
-      { name: 'base_items', fn: this.scrapeWowheadListing }
+      { name: 'base_items', fn: this.scrapeWowheadListing },
+      { name: 'item_desc', fn: this.scrapeBlizzardAPI.bind(this) }
     ]
+
+    try {
+      this.blizzardToken = fs.readFileSync(`${__dirname}/../${blizzardToken}`, 'utf8').trim()
+    } catch (err) {
+      if (err.code !== 'ENOENT') throw err // Don't throw error if file simply doesn't exist
+      else console.log(`${colors.yellow('Warning')}: Blizzard Token could not be found.`)
+    }
   }
 
   /**
@@ -29,7 +38,7 @@ class Build {
     for (const stage of this.pipeline) {
       if (transform(stage.name) === transform(step)) {
         const result = await stage.fn(fileIn ? this.readJSON(fileIn) : undefined)
-        this.saveJSON(fileOut, result)
+        if (fileOut) this.saveJSON(fileOut, result)
         break
       }
     }
@@ -46,10 +55,8 @@ class Build {
     const stepSize = 500 // Wowhead can only show about 500 items per page.
     const progress = new ProgressBar('Fetching base items', 24000 / stepSize)
     for (let i = 0; i < 24000; i += stepSize) {
-      const url = `https://classic.wowhead.com/items?filter=151:151;2:5;${i}:${i + stepSize}`
-
       const req = await request({
-        url,
+        url: `https://classic.wowhead.com/items?filter=151:151;2:5;${i}:${i + stepSize}`,
         json: true
       })
 
@@ -75,6 +82,27 @@ class Build {
   }
 
   /**
+   * Scrapes the information of the official Blizzard API. (Requires an API key)
+   * Updates the given data with more description (class, subclass, slot, sellPrice, quality, itemLevel, requiredLevel)
+   * Also sanitizes the input by throwing everything away the Blizzard API doesn't know.
+   */
+  async scrapeBlizzardAPI (input) {
+    if (!this.blizzardToken) {
+      console.log('Skipping this stage because blizzard token could not be found.')
+      return input
+    }
+
+    for (const item of input) {
+      const req = await request({
+        url: `https://us.api.blizzard.com/data/wow/item/${item.itemId}?namespace=static-classic-us&locale=en_US&access_token=${this.blizzardToken}`,
+        json: true
+      })
+      console.log(req.body)
+      break
+    }
+  }
+
+  /**
    * Saves data into a .json file.
    */
   saveJSON (fileName, data) {
@@ -90,4 +118,5 @@ class Build {
 }
 
 const build = new Build()
-build.start()
+// build.start()
+build.step('item_desc', false, 'tmp/base_items.json')
