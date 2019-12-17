@@ -1,13 +1,38 @@
 const request = require('requestretry')
 const cheerio = require('cheerio')
 const ProgressBar = require('./progress')
+const fs = require('fs')
 
 class Build {
+  constructor() {
+    this.pipeline = [
+      { name: 'base_items', fn: this.scrapeWowheadListing }
+    ]
+  }
+
   /**
    * Starts the build process
    */
   async start () {
-    const baseItems = await this.scrapeWowheadListing()
+    let stageResult = undefined
+    for (const stage of this.pipeline) {
+      stageResult = await stage.fn(stageResult)
+    }
+    this.saveJSON('json/data.json', stageResult)
+  }
+
+  /**
+   * Only perform a single step of the whole pipeline, with a specified output or input
+   */
+  async step (step, fileOut, fileIn = false) {
+    const transform = (name) => name.replace(/_/g, '').toLowerCase() // Helper function so naming conventions don't conflict
+    for (const stage of this.pipeline) {
+      if (transform(stage.name) === transform(step)) {
+        const result = await stage.fn(fileIn ? this.readJSON(fileIn) : undefined)
+        this.saveJSON(fileOut, result)
+        break
+      }
+    }
   }
 
   /**
@@ -47,6 +72,20 @@ class Build {
     }
 
     return items
+  }
+
+  /**
+   * Saves data into a .json file.
+   */
+  saveJSON (fileName, data) {
+    fs.writeFileSync(`${__dirname}/../data/${fileName}`, JSON.stringify(data))
+  }
+
+  /**
+   * Reads data from a .json file
+   */
+  readJSON (fileName) {
+    return JSON.parse(fs.readFileSync(`${__dirname}/../data/${fileName}`, 'utf8'))
   }
 }
 
