@@ -8,7 +8,8 @@ class Build {
   constructor(blizzardToken = 'blizzard_token') {
     this.pipeline = [
       { name: 'base_items', fn: this.scrapeWowheadListing },
-      { name: 'item_desc', fn: this.scrapeBlizzardAPI.bind(this) }
+      { name: 'item_desc', fn: this.scrapeBlizzardAPI.bind(this) },
+      { name: 'crafting', fn: this.scrapeWowheadCrafting }
     ]
 
     try {
@@ -20,7 +21,7 @@ class Build {
   }
 
   /**
-   * Starts the build process
+   * Starts the build process.
    */
   async start () {
     let stageResult = undefined
@@ -31,7 +32,7 @@ class Build {
   }
 
   /**
-   * Only perform a single step of the whole pipeline, with a specified output or input
+   * Only perform a single step of the whole pipeline, with a specified output or input file.
    */
   async step (step, fileOut, fileIn = false) {
     const transform = (name) => name.replace(/_/g, '').toLowerCase() // Helper function so naming conventions don't conflict
@@ -82,8 +83,8 @@ class Build {
   }
 
   /**
-   * Scrapes the information of the official Blizzard API. (Requires an API key)
-   * Updates the given data with more description (class, subclass, slot, sellPrice, quality, itemLevel, requiredLevel)
+   * Scrapes the information of the official Blizzard API (Requires an API key)
+   * Updates the given data with more description (class, subclass, sellPrice, quality, itemLevel, requiredLevel, slot)
    * Also sanitizes the input by throwing everything away the Blizzard API doesn't know.
    */
   async scrapeBlizzardAPI (input) {
@@ -105,9 +106,7 @@ class Build {
 
       // Catch unknown error codes or sanitize input if known
       if (res.code) {
-        if (res.detail !== 'Not Found') {
-          this.warn(`Unknown Blizzard Error with code ${res.code} on item ${item.itemId}: ${res.detail}`)
-        }
+        if (res.detail !== 'Not Found') this.warn(`Unknown Blizzard Error with code ${res.code} on item ${item.itemId}: ${res.detail}`)
         return
       }
 
@@ -143,6 +142,86 @@ class Build {
   }
 
   /**
+   * Scrapes all crafting related information from Wowhead.
+   */
+  async scrapeWowheadCrafting (input) {
+    const applyCraftingInfo = async (item) => {
+      const req = await request({
+        url: `https://classic.wowhead.com/item=${item.itemId}`,
+        json: true
+      })
+
+      // Categories. Hardcode taken from Wowhead source code
+      const categories = {
+        333: 'Enchanting',
+        202: 'Engineering',
+        197: 'Tailoring',
+        186: 'Mining',
+        185: 'Cooking',
+        171: 'Alchemy',
+        165: 'Leatherworking',
+        164: 'Blacksmithing',
+        129: 'First Aid'
+      }
+
+      // Wowhead uses JavaScript to load in their table content, so we'd need something like Selenium to get the HTML.
+      // However, that is really painful and slow. Fortunately, with some parsing the table content is available in the source code.
+      // We just have to search for the right ListView() with crafting information.
+      const $ = cheerio.load(req.body)
+      const tableContentRaw = $('script[type="text/javascript"]').get()
+      let foundCreatedBy = false
+      for (const contentRaw of tableContentRaw) {
+        const content = contentRaw.children[0].data
+        if (!content.includes('new Listview({')) continue
+
+        const listViews = content.split('new Listview({')
+        for (const listView of listViews) {
+          const props = listView.split('\n')
+          for (const prop of props) {
+            if (prop.includes('id: \'created-by-spell\'')) foundCreatedBy = true
+            if (foundCreatedBy && prop.includes('data:')) {
+              // Array of spells this item is created by
+              const data = JSON.parse(prop.slice(prop.indexOf('data:') + 5, -1))
+              for (const spell of data) {
+                // Filter out some edge cases
+                if (spell.cat === 0 || !spell.hasOwnProperty('skill') || !spell.skill.length) continue
+
+                if (!item.createdBy) item.createdBy = []
+                const createdByEntry = {
+                  amount: spell.creates.slice(1),
+                  requiredSkill: spell.learnedat,
+                  category: categories[spell.skill[0]] || spell.skill[0],
+                  reagents: []
+                }
+                if (spell.reagents) createdByEntry.reagents = spell.reagents.map((r) => {
+                  return { itemId: r[0], amount: r[1] }
+                })
+                item.createdBy.push(createdByEntry)
+              }
+            }
+          }
+          if (foundCreatedBy) break
+        }
+      }
+    }
+
+    let parallel = []
+    const batchSize = 200
+    const progress = new ProgressBar('Fetching crafting info', input.length / batchSize)
+    for (let i = 0; i < input.length; i++) {
+      const item = input[i]
+      parallel.push(applyCraftingInfo(item))
+      if (parallel.length >= batchSize || i === input.length - 1) {
+        await Promise.all(parallel)
+        progress.tick()
+        parallel = []
+      }
+    }
+
+    return input
+  }
+
+  /**
    * Saves data into a .json file.
    */
   saveJSON (fileName, data) {
@@ -157,7 +236,7 @@ class Build {
   }
 
   /**
-   * Cosmetic function for build warnings
+   * Cosmetic function for build warnings.
    */
   warn (message) {
     console.log(`${colors.yellow('Warning')}: ${message}`)
@@ -166,4 +245,4 @@ class Build {
 
 const build = new Build()
 // build.start()
-build.step('item_desc', 'tmp/extended_items.json', 'tmp/base_items.json')
+build.step('crafting', 'tmp/complete.json', 'tmp/extended_items.json')
