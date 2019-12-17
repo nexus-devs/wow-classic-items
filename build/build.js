@@ -1,5 +1,6 @@
 const request = require('requestretry')
 const cheerio = require('cheerio')
+const ProgressBar = require('./progress')
 
 class Build {
   /**
@@ -18,6 +19,7 @@ class Build {
 
     // Filter the items by ID (total ID range about 24000).
     const stepSize = 500 // Wowhead can only show about 500 items per page.
+    const progress = new ProgressBar('Fetching base items', 24000 / stepSize)
     for (let i = 0; i < 24000; i += stepSize) {
       const url = `https://classic.wowhead.com/items?filter=151:151;2:5;${i}:${i + stepSize}`
 
@@ -40,6 +42,8 @@ class Build {
           icon: item.icon
         })
       }
+
+      progress.tick()
     }
 
     return items
