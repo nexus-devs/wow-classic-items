@@ -18,7 +18,7 @@ npm install wow-classic-items
 const Items = require('wow-classic-items')
 const items = new Items(options)
 ```
-`items` is functionally identical to an array an can be used as such:
+`items` is functionally identical to an array and can be used as such:
 ```js
 items[0] // Returns first item
 items.filter((i) => i.class === 'Weapon')
@@ -31,11 +31,6 @@ items.map((i) => i.itemId)
 | Option | Default | Description |
 |:-------|:--------|:------------|
 | iconSrc | `'blizzard'` | Specifies from which source the item icon URL's are generated. Valid values are `'blizzard'`, `'wowhead'` and `false` (in this case only the icon name is returned).
-
-<br>
-<br>
-
-## For Developers
 
 <br>
 
