@@ -5,7 +5,7 @@ const fs = require('fs')
 const colors = require('colors/safe')
 
 class Build {
-  constructor(blizzardToken = 'blizzard_token') {
+  constructor (blizzardToken = 'blizzard_token') {
     this.pipeline = [
       { name: 'base_items', fn: this.scrapeWowheadListing },
       { name: 'item_desc', fn: this.scrapeBlizzardAPI.bind(this) },
@@ -24,7 +24,7 @@ class Build {
    * Starts the build process.
    */
   async start () {
-    let stageResult = undefined
+    let stageResult
     for (const stage of this.pipeline) {
       stageResult = await stage.fn(stageResult)
     }
@@ -119,7 +119,7 @@ class Build {
       item.requiredLevel = res.required_level
 
       // Add slot if item can be equipped
-      if (res.inventory_type.hasOwnProperty('name')) item.slot = res.inventory_type.name
+      if (res.inventory_type.name) item.slot = res.inventory_type.name
       else if (res.inventory_type.type === 'RANGEDRIGHT') item.slot = 'Ranged' // Catch weird edge case
 
       items.push(item)
@@ -184,7 +184,7 @@ class Build {
               const data = JSON.parse(prop.slice(prop.indexOf('data:') + 5, -1))
               for (const spell of data) {
                 // Filter out some edge cases
-                if (spell.cat === 0 || !spell.hasOwnProperty('skill') || !spell.skill.length) continue
+                if (spell.cat === 0 || !spell.skill || !spell.skill.length) continue
 
                 if (!item.createdBy) item.createdBy = []
                 const createdByEntry = {
@@ -193,9 +193,9 @@ class Build {
                   category: categories[spell.skill[0]] || spell.skill[0],
                   reagents: []
                 }
-                if (spell.reagents) createdByEntry.reagents = spell.reagents.map((r) => {
+                if (spell.reagents) { createdByEntry.reagents = spell.reagents.map((r) => {
                   return { itemId: r[0], amount: r[1] }
-                })
+                }) }
                 item.createdBy.push(createdByEntry)
               }
             }

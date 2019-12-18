@@ -5,8 +5,13 @@
   "main": "index.js",
   "scripts": {
     "build": "node ./build/build.js",
+    "validate": "node ./build/validate.js",
     "test": "echo \"Error: no test specified\" && exit 1",
     "lint": "eslint --ignore-path .gitignore ."
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Nakroma/wow-classic-items.git"
   },
   "author": "Nakroma",
   "license": "MIT",
