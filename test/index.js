@@ -16,9 +16,9 @@ describe('index.js', function () {
   })
 
   it('should filter items correctly', function () {
-    const items = new Items()
+    const items = new Items({ iconSrc: false })
     const filteredItems = items.filter((x) => x.class === 'Weapon')
-    const filteredGroundTruth = items.filter((x) => x.class === 'Weapon')
+    const filteredGroundTruth = groundTruth.filter((x) => x.class === 'Weapon')
     assert.deepStrictEqual(filteredItems, filteredGroundTruth)
   })
 
