@@ -1,6 +1,27 @@
+const fs = require('fs')
+
+const defaultOptions = {
+  iconSrc: 'blizzard'
+}
+
 class Items extends Array {
-  constructor () {
-    const data = require('./data/json/data.json')
+  constructor (options) {
+    let data = JSON.parse(fs.readFileSync(`${__dirname}/data/json/data.json`, 'utf8'))
+    const opts = { ...defaultOptions, ...options } // Merge options
+
+    // Parse icons to URL
+    if (opts.iconSrc === 'blizzard') {
+      data = data.map((x) => {
+        x.icon = `https://render-classic-us.worldofwarcraft.com/icons/56/${x.icon}.jpg`
+        return x
+      })
+    } else if (opts.iconSrc === 'wowhead') {
+      data = data.map((x) => {
+        x.icon = `https://wow.zamimg.com/images/wow/icons/large/${x.icon}.jpg`
+        return x
+      })
+    }
+
     super(...data)
   }
 
