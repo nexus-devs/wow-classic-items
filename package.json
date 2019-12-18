@@ -13,7 +13,7 @@
     "type": "git",
     "url": "https://github.com/Nakroma/wow-classic-items.git"
   },
-  "author": "Nakroma",
+  "author": "nakroma",
   "license": "MIT",
   "devDependencies": {
     "cheerio": "^1.0.0-rc.3",
