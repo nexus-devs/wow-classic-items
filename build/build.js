@@ -28,7 +28,7 @@ class Build {
     for (const stage of this.pipeline) {
       stageResult = await stage.fn(stageResult)
     }
-    this.saveJSON('json/data.json', stageResult)
+    this.saveJSON('build/data.json', stageResult)
   }
 
   /**
@@ -244,5 +244,4 @@ class Build {
 }
 
 const build = new Build()
-// build.start()
-build.step('crafting', 'tmp/complete.json', 'tmp/extended_items.json')
+build.start()

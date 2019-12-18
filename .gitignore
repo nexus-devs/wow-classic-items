@@ -1,4 +1,5 @@
 .idea/
 node_modules/
-data/tmp/
+*/tmp
+*/build
 blizzard_token
