@@ -4,9 +4,12 @@ const defaultOptions = {
   iconSrc: 'blizzard'
 }
 
-class Items extends Array {
-  constructor (options) {
-    let data = JSON.parse(fs.readFileSync(`${__dirname}/data/json/data.json`, 'utf8'))
+/**
+ * Main Database class
+ */
+class Database extends Array {
+  constructor (fileName, options) {
+    let data = JSON.parse(fs.readFileSync(`${__dirname}/data/json/${fileName}.json`, 'utf8'))
     const opts = { ...defaultOptions, ...options } // Merge options
 
     // Parse icons to URL
@@ -50,4 +53,29 @@ class Items extends Array {
   }
 }
 
-module.exports = Items
+/**
+ * Item Database
+ */
+class Items extends Database {
+  constructor (options) {
+    super('data', options)
+  }
+}
+
+/**
+ * Professions Database
+ */
+class Professions extends Database {
+  constructor (options) {
+    super('professions', options)
+  }
+
+  /**
+   * Really small wrapper class to make professions accessible via .get('professionName')
+   */
+  get (name) {
+    return this.find((p) => p.name === name)
+  }
+}
+
+module.exports = { Items, Professions }

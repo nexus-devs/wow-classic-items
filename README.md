@@ -2,7 +2,7 @@
 [![npm](https://img.shields.io/npm/v/wow-classic-items.svg)](https://npmjs.org/wow-classic-items)
 [![Discord](https://img.shields.io/discord/256087517353213954.svg?logo=discord)](https://discord.gg/jGZxH9f)
 
-Fetches all WoW Classic items from Wowhead and the official Blizzard API and makes them available for use in your project.
+Fetches all WoW Classic items and professions from Wowhead and the official Blizzard API and makes them available for use in your project.
 
 <br>
 
@@ -15,14 +15,16 @@ npm install wow-classic-items
 
 ### Usage
 ```js
-const Items = require('wow-classic-items')
-const items = new Items(options)
+const Database = require('wow-classic-items')
+const items = new Database.Items(options)
+const professions = new Database.Professions(options)
 ```
 `items` is functionally identical to an array and can be used as such:
 ```js
 items[0] // Returns first item
 items.filter((i) => i.class === 'Weapon')
 items.map((i) => i.itemId)
+professions.get('Alchemy') // .get returns specified profession
 ```
 
 <br>
