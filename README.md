@@ -35,6 +35,7 @@ items.map((i) => i.itemId)
 <br>
 
 ### Building and Testing
+The professions database is currently handmade.  
 Build the item database (default output is `/data/build/data.json`):
 ```
 npm run build
