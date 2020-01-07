@@ -188,7 +188,7 @@ class Build {
 
                 if (!item.createdBy) item.createdBy = []
                 const createdByEntry = {
-                  amount: spell.creates.slice(1),
+                  amount: spell.creates.slice(1).map(a => a <= 0 ? 1 : a), // Sometimes Wowhead items list amount as 0
                   requiredSkill: spell.learnedat,
                   category: categories[spell.skill[0]] || spell.skill[0],
                   reagents: []
