@@ -164,6 +164,17 @@ class Build {
         129: 'First Aid'
       }
 
+      // Qualities in CSS classes. Hardcode taken from Wowhead source code
+      const qualities = {
+        'q': 'Misc',
+        'q0': 'Poor',
+        'q1': 'Common',
+        'q2': 'Uncommon',
+        'q3': 'Rare',
+        'q4': 'Epic',
+        'q5': 'Legendary'
+      }
+
       // Wowhead uses JavaScript to load in their table content, so we'd need something like Selenium to get the HTML.
       // However, that is really painful and slow. Fortunately, with some parsing the table content is available in the source code.
       // We just have to search for the right ListView() with crafting information.
@@ -203,7 +214,72 @@ class Build {
           if (foundCreatedBy) break
         }
       }
+
+      // Now we parse the tooltip information. The Wowhead format is really fucked up, but with some creative parsing we make it work.
+      // The tooltip is saved inside the variable g_items[id].tooltip_enus
+      const tooltipRaw = req.body.split('\n').find((line) => line.includes('.tooltip_enus'))
+      const tooltipString = tooltipRaw.split(' = ')[1].slice(1, -2)
+      const tooltipStringCleaned = tooltipString.replace(/\\n|(<!--.*?-->)|(<a href=.*?>)|\\/g, '').replace(/(<\/a>)/g, '')
+
+      const $2 = cheerio.load(tooltipStringCleaned)
+      // Get raw labels this way instead of the cool one because cheerio doesn't preserve order
+      const labelsRaw = tooltipStringCleaned.match(/>(.*?)</g).map(s => s.slice(1, -1))
+
+      const doubleCount = {} // Needed to count multiple occurrences (for sets for example)
+      let currentlyOnSellprice = false // Needed to remove sell price lines
+      const tooltip = []
+      for (let label of labelsRaw) {
+        if (label.trim() === '') continue // Filter empty labels
+
+        if (currentlyOnSellprice) {
+          if (!isNaN(parseInt(label))) continue
+          else currentlyOnSellprice = false
+        }
+        if (label === 'Sell Price: ') {
+          currentlyOnSellprice = true
+          label = 'Sell Price:'
+        }
+
+        // Count occurrences
+        if (doubleCount[label]) doubleCount[label]++
+        else doubleCount[label] = 1
+
+        // Get corresponding tag
+        const tags = $2('html *').filter(function () {
+          return $2(this).text() === label
+        })
+        const tag = tags[doubleCount[label] - 1]
+        const classes = tag && $2(tag).attr('class') ? $2(tag).attr('class').split(' ') : undefined
+        const parent = tag ? $2(tag).parent()[0] : undefined
+        const parentClasses = parent && $2(parent).attr('class') ? $2(parent).attr('class').split(' ') : undefined
+
+        const newLabelObj = { label: label.replace(/&nbsp;/g, ' ') }
+
+        // Add color formatting
+        if (classes && qualities[classes[0]]) newLabelObj['format'] = qualities[classes[0]] // Add color format
+        else if (parentClasses && qualities[parentClasses[0]]) newLabelObj['format'] = qualities[parentClasses[0]] // Add color format from parent
+
+        // Add alignment formatting
+        if (tag && tag.name === 'th') newLabelObj['format'] = 'alignRight'
+        if (tag) {
+          let currentTag = $2(tag)
+          while (currentTag.parent()[0]) {
+            const currentParentClasses = $2(currentTag.parent()[0]).attr('class')
+            if (currentParentClasses && currentParentClasses.split(' ').includes('indent')) {
+              newLabelObj['format'] = 'indent'
+              break
+            }
+            currentTag = $2(currentTag.parent()[0])
+          }
+        }
+
+        tooltip.push(newLabelObj)
+      }
+      item.tooltip = tooltip
     }
+
+    await applyCraftingInfo(input.find(i => i.itemId === 19019))
+    return
 
     let parallel = []
     const batchSize = 200
@@ -244,4 +320,5 @@ class Build {
 }
 
 const build = new Build()
-build.start()
+// build.start()
+build.step('crafting', false, 'tmp/extended_items.json')
