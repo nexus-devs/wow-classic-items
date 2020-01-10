@@ -9,7 +9,7 @@ class Build {
     this.pipeline = [
       { name: 'base_items', fn: this.scrapeWowheadListing },
       { name: 'item_desc', fn: this.scrapeBlizzardAPI.bind(this) },
-      { name: 'crafting', fn: this.scrapeWowheadCrafting }
+      { name: 'item_details', fn: this.scrapeWowheadDetail }
     ]
 
     try {
@@ -142,9 +142,9 @@ class Build {
   }
 
   /**
-   * Scrapes all crafting related information from Wowhead.
+   * Scrapes all crafting, tooltip and itemLink related information from Wowhead.
    */
-  async scrapeWowheadCrafting (input) {
+  async scrapeWowheadDetail (input) {
     const applyCraftingInfo = async (item) => {
       const req = await request({
         url: `https://classic.wowhead.com/item=${item.itemId}`,
@@ -253,7 +253,7 @@ class Build {
         const parent = tag ? $2(tag).parent()[0] : undefined
         const parentClasses = parent && $2(parent).attr('class') ? $2(parent).attr('class').split(' ') : undefined
 
-        const newLabelObj = { label: label.replace(/&nbsp;/g, ' ') }
+        const newLabelObj = {label: label.replace(/&nbsp;/g, ' ')}
 
         // Add color formatting
         if (classes && qualities[classes[0]]) newLabelObj.format = qualities[classes[0]] // Add color format
@@ -324,5 +324,4 @@ class Build {
 }
 
 const build = new Build()
-// build.start()
-build.step('crafting', 'build/data.json', 'tmp/extended_items.json')
+build.start()
