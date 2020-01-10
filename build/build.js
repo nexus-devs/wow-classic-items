@@ -166,13 +166,13 @@ class Build {
 
       // Qualities in CSS classes. Hardcode taken from Wowhead source code
       const qualities = {
-        'q': 'Misc',
-        'q0': 'Poor',
-        'q1': 'Common',
-        'q2': 'Uncommon',
-        'q3': 'Rare',
-        'q4': 'Epic',
-        'q5': 'Legendary'
+        q: 'Misc',
+        q0: 'Poor',
+        q1: 'Common',
+        q2: 'Uncommon',
+        q3: 'Rare',
+        q4: 'Epic',
+        q5: 'Legendary'
       }
 
       // Wowhead uses JavaScript to load in their table content, so we'd need something like Selenium to get the HTML.
@@ -256,17 +256,17 @@ class Build {
         const newLabelObj = { label: label.replace(/&nbsp;/g, ' ') }
 
         // Add color formatting
-        if (classes && qualities[classes[0]]) newLabelObj['format'] = qualities[classes[0]] // Add color format
-        else if (parentClasses && qualities[parentClasses[0]]) newLabelObj['format'] = qualities[parentClasses[0]] // Add color format from parent
+        if (classes && qualities[classes[0]]) newLabelObj.format = qualities[classes[0]] // Add color format
+        else if (parentClasses && qualities[parentClasses[0]]) newLabelObj.format = qualities[parentClasses[0]] // Add color format from parent
 
         // Add alignment formatting
-        if (tag && tag.name === 'th') newLabelObj['format'] = 'alignRight'
+        if (tag && tag.name === 'th') newLabelObj.format = 'alignRight'
         if (tag) {
           let currentTag = $2(tag)
           while (currentTag.parent()[0]) {
             const currentParentClasses = $2(currentTag.parent()[0]).attr('class')
             if (currentParentClasses && currentParentClasses.split(' ').includes('indent')) {
-              newLabelObj['format'] = 'indent'
+              newLabelObj.format = 'indent'
               break
             }
             currentTag = $2(currentTag.parent()[0])
@@ -276,10 +276,14 @@ class Build {
         tooltip.push(newLabelObj)
       }
       item.tooltip = tooltip
-    }
 
-    await applyCraftingInfo(input.find(i => i.itemId === 19019))
-    return
+      // Now we get the itemLink for ingame (https://wowwiki.fandom.com/wiki/ItemLink)
+      // The information is saved in on of the onclicks
+      const itemLinkRaw = req.body.split('\n').find((line) => line.includes('onclick="WH.Links.show(this, {&quot;linkColor'))
+      const itemLinkString = itemLinkRaw.split('onclick="WH.Links.show(this, ')[1].slice(0, -19).replace(/&quot;/g, '"')
+      const itemLinkData = JSON.parse(itemLinkString)
+      item.itemLink = `|c${itemLinkData.linkColor}|H${itemLinkData.linkId}|h[${itemLinkData.linkName}]|h|r`
+    }
 
     let parallel = []
     const batchSize = 200
@@ -321,4 +325,4 @@ class Build {
 
 const build = new Build()
 // build.start()
-build.step('crafting', false, 'tmp/extended_items.json')
+build.step('crafting', 'build/data.json', 'tmp/extended_items.json')
