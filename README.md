@@ -24,6 +24,8 @@ const professions = new Database.Professions(options)
 items[0] // Returns first item
 items.filter((i) => i.class === 'Weapon')
 items.map((i) => i.itemId)
+
+items.getItemLink(123468) // Returns copy paste-able ingame link
 professions.get('Alchemy') // .get returns specified profession
 ```
 

@@ -60,6 +60,14 @@ class Items extends Database {
   constructor (options) {
     super('data', options)
   }
+
+  /**
+   * Converts the item link into an ingame parse-able string.
+   */
+  getItemLink (itemId) {
+    const link = this.find((p) => p.itemId === itemId).itemLink.replace(/\|/g, '\\124')
+    return `/script DEFAULT_CHAT_FRAME:AddMessage("${link}");`
+  }
 }
 
 /**

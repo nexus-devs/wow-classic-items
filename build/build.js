@@ -253,7 +253,7 @@ class Build {
         const parent = tag ? $2(tag).parent()[0] : undefined
         const parentClasses = parent && $2(parent).attr('class') ? $2(parent).attr('class').split(' ') : undefined
 
-        const newLabelObj = {label: label.replace(/&nbsp;/g, ' ')}
+        const newLabelObj = { label: label.replace(/&nbsp;/g, ' ') }
 
         // Add color formatting
         if (classes && qualities[classes[0]]) newLabelObj.format = qualities[classes[0]] // Add color format

@@ -45,4 +45,10 @@ describe('index.js', function () {
     const professions = new Database.Professions()
     assert(professions.get('Alchemy').name === 'Alchemy')
   })
+
+  it('should parse item link correctly', function () {
+    const items = new Database.Items({ iconSrc: false })
+    const link = items.getItemLink(13510)
+    assert(link === '/script DEFAULT_CHAT_FRAME:AddMessage("\\124cffffffff\\124Hitem:13510::::::::::0\\124h[Flask of the Titans]\\124h\\124r");')
+  })
 })
