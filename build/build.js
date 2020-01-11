@@ -230,6 +230,7 @@ class Build {
       const tooltip = []
       for (let label of labelsRaw) {
         if (label.trim() === '') continue // Filter empty labels
+        label = label.replace(/&quot;/g, '"').replace(/&lt;/g, '<').replace(/&gt;/g, '>')
 
         if (currentlyOnSellprice) {
           if (!isNaN(parseInt(label))) continue
@@ -324,4 +325,5 @@ class Build {
 }
 
 const build = new Build()
-build.start()
+// build.start()
+build.step('item_details', '/build/data.json', 'tmp/extended_items.json')
