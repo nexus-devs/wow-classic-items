@@ -27,6 +27,22 @@ items.map((i) => i.itemId)
 professions.get('Alchemy') // .get returns specified profession
 ```
 
+##### Tooltip
+The tooltip is built the following way:
+```
+[{ label: 'Thunderfury, Blessed Blade of the Windseeker', format: 'Legendary' }, ...]
+```
+Each label represents one line in the tooltip. The format field specifies if theres a special formatting:
+
+| Format | Meaning |
+|:-------|:--------|
+| Quality | If there is a quality (Common, Rare, Legendary...) it specifies the corresponding color of the label.
+| `Misc` | This also refers to the label color: The item level and flavor text.
+| `alignRight` | This means that the label is aligned inline to the right of the previous label (for example Armor ---- Plate).
+| `indent` | This means that the label is indented and should be treated as if it was quality `Poor` (for example in set pieces).
+
+Note that the actual sell price is not included in the tooltip (just the label), so you can format it how you want.
+
 <br>
 
 ### Configuration
