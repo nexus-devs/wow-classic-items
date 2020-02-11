@@ -156,7 +156,8 @@ class Build {
       await Promise.all([
         this.parseWowheadDetailCrafting(req, item),
         this.parseWowheadDetailTooltip(req, item),
-        this.parseWowheadDetailItemLink(req, item)
+        this.parseWowheadDetailItemLink(req, item),
+        this.parseWowheadDetailVendor(req, item)
       ])
     }
 
@@ -180,7 +181,7 @@ class Build {
    * Parses Wowhead detail crafting information.
    * Wowhead uses JavaScript to load in their table content, so we'd need something like Selenium to get the HTML.
    * However, that is really painful and slow. Fortunately, with some parsing the table content is available in the source code.
-   * We just have to search for the right ListView() with crafting information.
+   * We just have to search for the right ListView() with crafting information ('reagent-for').
    */
   async parseWowheadDetailCrafting (req, item) {
     // Crafting categories. Hardcode taken from Wowhead source code
@@ -324,6 +325,49 @@ class Build {
     const itemLinkString = itemLinkRaw.split('onclick="WH.Links.show(this, ')[1].slice(0, -19).replace(/&quot;/g, '"')
     const itemLinkData = JSON.parse(itemLinkString)
     item.itemLink = `|c${itemLinkData.linkColor}|H${itemLinkData.linkId}|h[${itemLinkData.linkName}]|h|r`
+  }
+
+  /**
+   * Parses Wowhead detail vendor information.
+   * Vendoring information is stored inside the 'sold-by' ListView().
+   * The vendor price is a weighted average of all the infinite stock prices, weighted by popularity
+   */
+  async parseWowheadDetailVendor (req, item) {
+    const $ = cheerio.load(req.body)
+    const tableContentRaw = $('script[type="text/javascript"]').get()
+    for (const contentRaw of tableContentRaw) {
+      const content = contentRaw.children[0].data
+      if (!content.includes('new Listview({')) continue
+
+      const listViews = content.split('new Listview({')
+      for (const listView of listViews) {
+        if (!listView.includes('id: \'sold-by\'')) continue
+
+        const props = listView.split('\n')
+        for (const prop of props) {
+          if (!prop.includes('data: [')) continue
+
+          const data = JSON.parse(prop.slice(prop.indexOf('data:') + 5, -1))
+          const stocks = data.filter(i => i.stock === -1) // Only consider infinite stock
+
+          if (stocks.length) {
+            const totalPopularity = stocks.reduce((acc, stock) => acc + stock.popularity, 0)
+
+            item.vendorPrice = Math.round(stocks.reduce((acc, stock) => {
+              if (!stock.stack) stock.stack = 1 // Stack size is missing on non-stackable items
+
+              const costPerItem = stock.cost.reduce((acc, cV) => acc + cV, 0) / stock.cost.length / stock.stack
+              const weight = stock.popularity / totalPopularity
+              return acc + (costPerItem * weight)
+            }, 0))
+          }
+
+          break
+        }
+
+        break
+      }
+    }
   }
 
   /**
