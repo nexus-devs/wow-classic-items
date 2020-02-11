@@ -9,7 +9,7 @@ class Build {
     this.pipeline = [
       { name: 'base_items', fn: this.scrapeWowheadListing },
       { name: 'item_desc', fn: this.scrapeBlizzardAPI.bind(this) },
-      { name: 'item_details', fn: this.scrapeWowheadDetail },
+      { name: 'item_details', fn: this.scrapeWowheadDetail.bind(this) },
       { name: 'unique_names', fn: this.addUniqueNames }
     ]
 
@@ -152,139 +152,12 @@ class Build {
         json: true
       })
 
-      // Categories. Hardcode taken from Wowhead source code
-      const categories = {
-        333: 'Enchanting',
-        202: 'Engineering',
-        197: 'Tailoring',
-        186: 'Mining',
-        185: 'Cooking',
-        171: 'Alchemy',
-        165: 'Leatherworking',
-        164: 'Blacksmithing',
-        129: 'First Aid'
-      }
-
-      // Qualities in CSS classes. Hardcode taken from Wowhead source code
-      const qualities = {
-        q: 'Misc',
-        q0: 'Poor',
-        q1: 'Common',
-        q2: 'Uncommon',
-        q3: 'Rare',
-        q4: 'Epic',
-        q5: 'Legendary'
-      }
-
-      // Wowhead uses JavaScript to load in their table content, so we'd need something like Selenium to get the HTML.
-      // However, that is really painful and slow. Fortunately, with some parsing the table content is available in the source code.
-      // We just have to search for the right ListView() with crafting information.
-      const $ = cheerio.load(req.body)
-      const tableContentRaw = $('script[type="text/javascript"]').get()
-      let foundCreatedBy = false
-      for (const contentRaw of tableContentRaw) {
-        const content = contentRaw.children[0].data
-        if (!content.includes('new Listview({')) continue
-
-        const listViews = content.split('new Listview({')
-        for (const listView of listViews) {
-          const props = listView.split('\n')
-          for (const prop of props) {
-            if (prop.includes('id: \'created-by-spell\'')) foundCreatedBy = true
-            if (foundCreatedBy && prop.includes('data:')) {
-              // Array of spells this item is created by
-              const data = JSON.parse(prop.slice(prop.indexOf('data:') + 5, -1))
-              for (const spell of data) {
-                // Filter out some edge cases
-                if (spell.cat === 0 || !spell.skill || !spell.skill.length) continue
-
-                if (!item.createdBy) item.createdBy = []
-                const createdByEntry = {
-                  amount: spell.creates.slice(1).map(a => a <= 0 ? 1 : a), // Sometimes Wowhead items list amount as 0
-                  requiredSkill: spell.learnedat,
-                  category: categories[spell.skill[0]] || spell.skill[0],
-                  reagents: []
-                }
-                if (spell.reagents) { createdByEntry.reagents = spell.reagents.map((r) => {
-                  return { itemId: r[0], amount: r[1] }
-                }) }
-                item.createdBy.push(createdByEntry)
-              }
-            }
-          }
-          if (foundCreatedBy) break
-        }
-      }
-
-      // Now we parse the tooltip information. The Wowhead format is really fucked up, but with some creative parsing we make it work.
-      // The tooltip is saved inside the variable g_items[id].tooltip_enus
-      const tooltipRaw = req.body.split('\n').find((line) => line.includes('.tooltip_enus'))
-      const tooltipString = tooltipRaw.split(' = ')[1].slice(1, -2)
-      const tooltipStringCleaned = tooltipString.replace(/\\n|(<!--.*?-->)|(<a href=.*?>)|\\/g, '').replace(/(<\/a>)/g, '')
-
-      const $2 = cheerio.load(tooltipStringCleaned)
-      // Get raw labels this way instead of the cool one because cheerio doesn't preserve order
-      const labelsRaw = tooltipStringCleaned.match(/>(.*?)</g).map(s => s.slice(1, -1))
-
-      const doubleCount = {} // Needed to count multiple occurrences (for sets for example)
-      let currentlyOnSellprice = false // Needed to remove sell price lines
-      const tooltip = []
-      for (let label of labelsRaw) {
-        if (label.trim() === '') continue // Filter empty labels
-        label = label.replace(/&quot;/g, '"').replace(/&lt;/g, '<').replace(/&gt;/g, '>')
-
-        if (currentlyOnSellprice) {
-          if (!isNaN(parseInt(label))) continue
-          else currentlyOnSellprice = false
-        }
-        if (label === 'Sell Price: ') {
-          currentlyOnSellprice = true
-          label = 'Sell Price:'
-        }
-
-        // Count occurrences
-        if (doubleCount[label]) doubleCount[label]++
-        else doubleCount[label] = 1
-
-        // Get corresponding tag
-        const tags = $2('html *').filter(function () {
-          return $2(this).text() === label
-        })
-        const tag = tags[doubleCount[label] - 1]
-        const classes = tag && $2(tag).attr('class') ? $2(tag).attr('class').split(' ') : undefined
-        const parent = tag ? $2(tag).parent()[0] : undefined
-        const parentClasses = parent && $2(parent).attr('class') ? $2(parent).attr('class').split(' ') : undefined
-
-        const newLabelObj = { label: label.replace(/&nbsp;/g, ' ') }
-
-        // Add color formatting
-        if (classes && qualities[classes[0]]) newLabelObj.format = qualities[classes[0]] // Add color format
-        else if (parentClasses && qualities[parentClasses[0]]) newLabelObj.format = qualities[parentClasses[0]] // Add color format from parent
-
-        // Add alignment formatting
-        if (tag && tag.name === 'th') newLabelObj.format = 'alignRight'
-        if (tag) {
-          let currentTag = $2(tag)
-          while (currentTag.parent()[0]) {
-            const currentParentClasses = $2(currentTag.parent()[0]).attr('class')
-            if (currentParentClasses && currentParentClasses.split(' ').includes('indent')) {
-              newLabelObj.format = 'indent'
-              break
-            }
-            currentTag = $2(currentTag.parent()[0])
-          }
-        }
-
-        tooltip.push(newLabelObj)
-      }
-      item.tooltip = tooltip
-
-      // Now we get the itemLink for ingame (https://wowwiki.fandom.com/wiki/ItemLink)
-      // The information is saved in on of the onclicks
-      const itemLinkRaw = req.body.split('\n').find((line) => line.includes('onclick="WH.Links.show(this, {&quot;linkColor'))
-      const itemLinkString = itemLinkRaw.split('onclick="WH.Links.show(this, ')[1].slice(0, -19).replace(/&quot;/g, '"')
-      const itemLinkData = JSON.parse(itemLinkString)
-      item.itemLink = `|c${itemLinkData.linkColor}|H${itemLinkData.linkId}|h[${itemLinkData.linkName}]|h|r`
+      // If you add anything to this, make sure they don't overwrite item properties from each other
+      await Promise.all([
+        this.parseWowheadDetailCrafting(req, item),
+        this.parseWowheadDetailTooltip(req, item),
+        this.parseWowheadDetailItemLink(req, item)
+      ])
     }
 
     let parallel = []
@@ -301,6 +174,156 @@ class Build {
     }
 
     return input
+  }
+
+  /**
+   * Parses Wowhead detail crafting information.
+   * Wowhead uses JavaScript to load in their table content, so we'd need something like Selenium to get the HTML.
+   * However, that is really painful and slow. Fortunately, with some parsing the table content is available in the source code.
+   * We just have to search for the right ListView() with crafting information.
+   */
+  async parseWowheadDetailCrafting (req, item) {
+    // Crafting categories. Hardcode taken from Wowhead source code
+    const categories = {
+      333: 'Enchanting',
+      202: 'Engineering',
+      197: 'Tailoring',
+      186: 'Mining',
+      185: 'Cooking',
+      171: 'Alchemy',
+      165: 'Leatherworking',
+      164: 'Blacksmithing',
+      129: 'First Aid'
+    }
+
+    const $ = cheerio.load(req.body)
+    const tableContentRaw = $('script[type="text/javascript"]').get()
+    let foundCreatedBy = false
+    for (const contentRaw of tableContentRaw) {
+      const content = contentRaw.children[0].data
+      if (!content.includes('new Listview({')) continue
+
+      const listViews = content.split('new Listview({')
+      for (const listView of listViews) {
+        const props = listView.split('\n')
+        for (const prop of props) {
+          if (prop.includes('id: \'created-by-spell\'')) foundCreatedBy = true
+          if (foundCreatedBy && prop.includes('data:')) {
+            // Array of spells this item is created by
+            const data = JSON.parse(prop.slice(prop.indexOf('data:') + 5, -1))
+            for (const spell of data) {
+              // Filter out some edge cases
+              if (spell.cat === 0 || !spell.skill || !spell.skill.length) continue
+
+              if (!item.createdBy) item.createdBy = []
+              const createdByEntry = {
+                amount: spell.creates.slice(1).map(a => a <= 0 ? 1 : a), // Sometimes Wowhead items list amount as 0
+                requiredSkill: spell.learnedat,
+                category: categories[spell.skill[0]] || spell.skill[0],
+                reagents: []
+              }
+              if (spell.reagents) { createdByEntry.reagents = spell.reagents.map((r) => {
+                return { itemId: r[0], amount: r[1] }
+              }) }
+              item.createdBy.push(createdByEntry)
+            }
+          }
+        }
+        if (foundCreatedBy) break
+      }
+    }
+  }
+
+  /**
+   * Parses Wowhead detail tooltip information.
+   * The Wowhead format is really fucked up, but with some creative parsing we make it work.
+   * The tooltip is saved inside the variable g_items[id].tooltip_enus
+   */
+  async parseWowheadDetailTooltip (req, item) {
+    // Qualities in CSS classes. Hardcode taken from Wowhead source code
+    const qualities = {
+      q: 'Misc',
+      q0: 'Poor',
+      q1: 'Common',
+      q2: 'Uncommon',
+      q3: 'Rare',
+      q4: 'Epic',
+      q5: 'Legendary'
+    }
+
+    const tooltipRaw = req.body.split('\n').find((line) => line.includes('.tooltip_enus'))
+    const tooltipString = tooltipRaw.split(' = ')[1].slice(1, -2)
+    const tooltipStringCleaned = tooltipString.replace(/\\n|(<!--.*?-->)|(<a href=.*?>)|\\/g, '').replace(/(<\/a>)/g, '')
+
+    const $2 = cheerio.load(tooltipStringCleaned)
+    // Get raw labels this way instead of the cool one because cheerio doesn't preserve order
+    const labelsRaw = tooltipStringCleaned.match(/>(.*?)</g).map(s => s.slice(1, -1))
+
+    const doubleCount = {} // Needed to count multiple occurrences (for sets for example)
+    let currentlyOnSellprice = false // Needed to remove sell price lines
+    const tooltip = []
+    for (let label of labelsRaw) {
+      if (label.trim() === '') continue // Filter empty labels
+      label = label.replace(/&quot;/g, '"').replace(/&lt;/g, '<').replace(/&gt;/g, '>')
+
+      if (currentlyOnSellprice) {
+        if (!isNaN(parseInt(label))) continue
+        else currentlyOnSellprice = false
+      }
+      if (label === 'Sell Price: ') {
+        currentlyOnSellprice = true
+        label = 'Sell Price:'
+      }
+
+      // Count occurrences
+      if (doubleCount[label]) doubleCount[label]++
+      else doubleCount[label] = 1
+
+      // Get corresponding tag
+      const tags = $2('html *').filter(function () {
+        return $2(this).text() === label
+      })
+      const tag = tags[doubleCount[label] - 1]
+      const classes = tag && $2(tag).attr('class') ? $2(tag).attr('class').split(' ') : undefined
+      const parent = tag ? $2(tag).parent()[0] : undefined
+      const parentClasses = parent && $2(parent).attr('class') ? $2(parent).attr('class').split(' ') : undefined
+
+      const newLabelObj = { label: label.replace(/&nbsp;/g, ' ') }
+
+      // Add color formatting
+      if (classes && qualities[classes[0]]) newLabelObj.format = qualities[classes[0]] // Add color format
+      else if (parentClasses && qualities[parentClasses[0]]) newLabelObj.format = qualities[parentClasses[0]] // Add color format from parent
+
+      // Add alignment formatting
+      if (tag && tag.name === 'th') newLabelObj.format = 'alignRight'
+      if (tag) {
+        let currentTag = $2(tag)
+        while (currentTag.parent()[0]) {
+          const currentParentClasses = $2(currentTag.parent()[0]).attr('class')
+          if (currentParentClasses && currentParentClasses.split(' ').includes('indent')) {
+            newLabelObj.format = 'indent'
+            break
+          }
+          currentTag = $2(currentTag.parent()[0])
+        }
+      }
+
+      tooltip.push(newLabelObj)
+    }
+
+    item.tooltip = tooltip
+  }
+
+  /**
+   * Parses Wowhead detail item link information.
+   * Gets the itemLink for ingame (https://wowwiki.fandom.com/wiki/ItemLink).
+   * The information is saved in on of the onclicks.
+   */
+  async parseWowheadDetailItemLink (req, item) {
+    const itemLinkRaw = req.body.split('\n').find((line) => line.includes('onclick="WH.Links.show(this, {&quot;linkColor'))
+    const itemLinkString = itemLinkRaw.split('onclick="WH.Links.show(this, ')[1].slice(0, -19).replace(/&quot;/g, '"')
+    const itemLinkData = JSON.parse(itemLinkString)
+    item.itemLink = `|c${itemLinkData.linkColor}|H${itemLinkData.linkId}|h[${itemLinkData.linkName}]|h|r`
   }
 
   /**
@@ -344,5 +367,4 @@ class Build {
 }
 
 const build = new Build()
-// build.start()
-build.step('unique_names', 'build/data.json', 'json/data.json')
+build.start()
