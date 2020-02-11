@@ -9,7 +9,8 @@ class Build {
     this.pipeline = [
       { name: 'base_items', fn: this.scrapeWowheadListing },
       { name: 'item_desc', fn: this.scrapeBlizzardAPI.bind(this) },
-      { name: 'item_details', fn: this.scrapeWowheadDetail }
+      { name: 'item_details', fn: this.scrapeWowheadDetail },
+      { name: 'unique_names', fn: this.addUniqueNames }
     ]
 
     try {
@@ -303,6 +304,24 @@ class Build {
   }
 
   /**
+   * Gives each item an unique item name
+   */
+  async addUniqueNames (input) {
+    const progress = new ProgressBar('Adding unique names', input.length)
+
+    for (const item of input) {
+      const doubleNamedItems = input.filter(i => i.name === item.name)
+      let uniqueName = item.name.toLowerCase().replace(' ', '-').replace(/[^a-zA-Z0-9-]/g, '')
+      if (doubleNamedItems.length > 1) uniqueName += `-${item.itemId}`
+
+      item.uniqueName = uniqueName
+      progress.tick()
+    }
+
+    return input
+  }
+
+  /**
    * Saves data into a .json file.
    */
   saveJSON (fileName, data) {
@@ -326,4 +345,4 @@ class Build {
 
 const build = new Build()
 // build.start()
-build.step('item_details', '/build/data.json', 'tmp/extended_items.json')
+build.step('unique_names', 'build/data.json', 'json/data.json')
