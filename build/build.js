@@ -378,7 +378,7 @@ class Build {
 
     for (const item of input) {
       const doubleNamedItems = input.filter(i => i.name === item.name)
-      let uniqueName = item.name.toLowerCase().replace(' ', '-').replace(/[^a-zA-Z0-9-]/g, '')
+      let uniqueName = item.name.toLowerCase().replace(/ /g, '-').replace(/[^a-zA-Z0-9-]/g, '')
       if (doubleNamedItems.length > 1) uniqueName += `-${item.itemId}`
 
       item.uniqueName = uniqueName
