@@ -157,7 +157,8 @@ class Build {
         this.parseWowheadDetailCrafting(req, item),
         this.parseWowheadDetailTooltip(req, item),
         this.parseWowheadDetailItemLink(req, item),
-        this.parseWowheadDetailVendor(req, item)
+        this.parseWowheadDetailVendor(req, item),
+        this.parseWowheadDetailContentPhase(req, item)
       ])
     }
 
@@ -325,6 +326,15 @@ class Build {
     const itemLinkString = itemLinkRaw.split('onclick="WH.Links.show(this, ')[1].slice(0, -19).replace(/&quot;/g, '"')
     const itemLinkData = JSON.parse(itemLinkString)
     item.itemLink = `|c${itemLinkData.linkColor}|H${itemLinkData.linkId}|h[${itemLinkData.linkName}]|h|r`
+  }
+
+  /**
+   * Parses Wowhead detail content phase.
+   * The information is stored as 'Added in content phase x' in the qucik facts box.
+   */
+  async parseWowheadDetailContentPhase (req, item) {
+    const phaseStringPos = req.body.indexOf('content phase ')
+    if (phaseStringPos > -1) item.contentPhase = parseInt(req.body.charAt(phaseStringPos + 14))
   }
 
   /**
