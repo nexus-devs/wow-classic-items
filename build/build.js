@@ -48,7 +48,7 @@ class Build {
 
   /**
    * Scrapes the item listings of Wowhead.
-   * This returns ALL (even weird, unobtainable ones) raw items { itemId, name, icon }
+   * This returns all raw items (except the ones marked as deprecated) { itemId, name, icon }
    */
   async scrapeWowheadListing () {
     const items = []
@@ -58,7 +58,7 @@ class Build {
     const progress = new ProgressBar('Fetching base items', 24000 / stepSize)
     for (let i = 0; i < 24000; i += stepSize) {
       const req = await request({
-        url: `https://classic.wowhead.com/items?filter=151:151;2:5;${i}:${i + stepSize}`,
+        url: `https://classic.wowhead.com/items?filter=162:151:151;2:2:5;0:${i}:${i + stepSize}`,
         json: true
       })
 
