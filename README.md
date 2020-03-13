@@ -29,6 +29,29 @@ items.getItemLink(123468) // Returns copy paste-able ingame link
 professions.get('Alchemy') // .get returns specified profession
 ```
 
+<br>
+
+### Item Properties
+```js
+[{
+  itemId: 19019, // Unique Item Id
+  name: 'Thunderfury, Blessed Blade of the Windseeker', // Display name
+  icon: 'inv_sword_39', // Display icon
+  class: 'Weapon', // Item class
+  subclass: 'Sword', // Item subclass, if available
+  sellPrice: 255355, // Price for what this item can be sold to a vendor
+  quality: 'Legendary', // Item quality
+  itemLevel: 80, // Item level
+  requiredLevel: 60, // Required level for this item
+  slot: 'One-Hand', // Item slot
+  tooltip: [Object], // Item tooltip (see below)
+  itemLink: '|cffff8000|Hitem:19019::::::::::0|h[Thunderfury, Blessed Blade of the Windseeker]|h|r', // Copy-pasteable ingame item link
+  uniqueName: 'thunderfury-blessed-blade-of-the-windseeker', // Unique item name
+  contentPhase: 3, // Content phase in which this item becomes available
+  vendorPrice: 1312 // Weighted vendor price if this item can be bought from a vendor
+}, ...]
+```
+
 ##### Tooltip
 The tooltip is built the following way:
 ```

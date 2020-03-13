@@ -1,6 +1,6 @@
 {
   "name": "wow-classic-items",
-  "version": "0.3.1",
+  "version": "0.4.0",
   "description": "Collection of all WoW Classic items.",
   "main": "index.js",
   "scripts": {
