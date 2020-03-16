@@ -162,6 +162,10 @@ class Build {
       ])
     }
 
+    await applyCraftingInfo(input.find(i => i.itemId === 13510))
+    console.log(input.find(i => i.itemId === 13510).createdBy[0].recipes)
+    return
+
     let parallel = []
     const batchSize = 200
     const progress = new ProgressBar('Fetching crafting info', input.length / batchSize)
@@ -222,7 +226,8 @@ class Build {
                 amount: spell.creates.slice(1).map(a => a <= 0 ? 1 : a), // Sometimes Wowhead items list amount as 0
                 requiredSkill: spell.learnedat,
                 category: categories[spell.skill[0]] || spell.skill[0],
-                reagents: []
+                reagents: [],
+                recipes: await this.parseWowheadDetailCraftingSpell(spell.id)
               }
               if (spell.reagents) { createdByEntry.reagents = spell.reagents.map((r) => {
                 return { itemId: r[0], amount: r[1] }
@@ -234,6 +239,37 @@ class Build {
         if (foundCreatedBy) break
       }
     }
+  }
+
+  /**
+   * Parses all available recipes for a crafting spell.
+   */
+  async parseWowheadDetailCraftingSpell (spellId) {
+    const recipes = []
+
+    const req = await request({
+      url: `https://classic.wowhead.com/spell=${spellId}`,
+      json: true
+    })
+
+    const $ = cheerio.load(req.body)
+    const tableContentRaw = $('script[type="text/javascript"]').get()
+    for (const contentRaw of tableContentRaw) {
+      const content = contentRaw.children[0].data
+      if (!content.includes('new Listview({')) continue
+
+      const listViews = content.split('new Listview({')
+      for (const listView of listViews) {
+        if (!listView.includes('id: \'taught-by-item\'')) continue
+
+        const data = JSON.parse(listView.slice(listView.indexOf('data:') + 5, -4))
+        for (const recipe of data) recipes.push(parseInt(recipe.id))
+
+        break
+      }
+    }
+
+    return recipes
   }
 
   /**
@@ -421,4 +457,5 @@ class Build {
 }
 
 const build = new Build()
-build.start()
+build.step('item_details', 'build/data.json', 'tmp/extended_items.json')
+// build.start()
