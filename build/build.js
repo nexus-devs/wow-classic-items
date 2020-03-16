@@ -162,13 +162,9 @@ class Build {
       ])
     }
 
-    await applyCraftingInfo(input.find(i => i.itemId === 13510))
-    console.log(input.find(i => i.itemId === 13510).createdBy[0].recipes)
-    return
-
     let parallel = []
     const batchSize = 200
-    const progress = new ProgressBar('Fetching crafting info', input.length / batchSize)
+    const progress = new ProgressBar('Fetching crafting info', (input.length / batchSize) + 1)
     for (let i = 0; i < input.length; i++) {
       const item = input[i]
       parallel.push(applyCraftingInfo(item))
@@ -178,6 +174,29 @@ class Build {
         parallel = []
       }
     }
+
+    // Apply crafting content phase, needs to be done after everything else
+    for (const item of input) {
+      const createdBy = item.createdBy
+      if (!createdBy) continue
+
+      for (let i = 0; i < item.createdBy.length; i++) {
+        const recipes = input.filter(currentItem => item.createdBy[i].recipes.includes(currentItem.itemId))
+
+        // Assign the smallest content phase
+        let contentPhase = null
+        for (const recipe of recipes) {
+          if (recipe.contentPhase) {
+            if (!contentPhase || recipe.contentPhase < contentPhase) contentPhase = recipe.contentPhase
+          } else {
+            contentPhase = null
+            break
+          }
+        }
+        if (contentPhase) item.createdBy[i].contentPhase = contentPhase
+      }
+    }
+    progress.tick()
 
     return input
   }
@@ -366,7 +385,7 @@ class Build {
 
   /**
    * Parses Wowhead detail content phase.
-   * The information is stored as 'Added in content phase x' in the qucik facts box.
+   * The information is stored as 'Added in content phase x' in the quick facts box.
    */
   async parseWowheadDetailContentPhase (req, item) {
     const phaseStringPos = req.body.indexOf('content phase ')
@@ -457,5 +476,4 @@ class Build {
 }
 
 const build = new Build()
-build.step('item_details', 'build/data.json', 'tmp/extended_items.json')
-// build.start()
+build.start()
