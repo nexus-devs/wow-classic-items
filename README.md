@@ -48,7 +48,14 @@ professions.get('Alchemy') // .get returns specified profession
   itemLink: '|cffff8000|Hitem:19019::::::::::0|h[Thunderfury, Blessed Blade of the Windseeker]|h|r', // Copy-pasteable ingame item link
   uniqueName: 'thunderfury-blessed-blade-of-the-windseeker', // Unique item name
   contentPhase: 3, // Content phase in which this item becomes available
-  vendorPrice: 1312 // Weighted vendor price if this item can be bought from a vendor
+  vendorPrice: 1312, // Weighted vendor price if this item can be bought from a vendor
+  source: { // Source, either Boss Drop, Rare Drop, Zone Drop or Quest
+    category: 'Boss Drop',
+    name: 'Some Random Boss', // Only set on Boss Drop
+    zone: [209], // Only set on Zone Drop
+    dropChance: 0.33, // Only set on Drops
+    quests: [{ questId: 256, name: 'Some Random Quest' }] // Only set on Quest
+  }
 }, ...]
 ```
 
