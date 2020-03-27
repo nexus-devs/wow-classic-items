@@ -218,7 +218,7 @@ class Build {
 
     let parallel = []
     const batchSize = 200
-    const progress = new ProgressBar('Fetching crafting info', (input.length / batchSize) + 1)
+    const progress = new ProgressBar('Fetching item details', (input.length / batchSize) + 1)
     for (let i = 0; i < input.length; i++) {
       const item = input[i]
       parallel.push(applyCraftingInfo(item))
@@ -613,5 +613,4 @@ class Build {
 }
 
 const build = new Build()
-// build.start()
-build.step('item_details', 'build/data.json', 'json/data.json')
+build.start()
