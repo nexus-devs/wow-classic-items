@@ -216,10 +216,6 @@ class Build {
       ])
     }
 
-    await applyCraftingInfo(input.find(i => i.itemId === 14148))
-    console.log(input.find(i => i.itemId === 14148))
-    return
-
     let parallel = []
     const batchSize = 200
     const progress = new ProgressBar('Fetching crafting info', (input.length / batchSize) + 1)
@@ -453,7 +449,7 @@ class Build {
   /**
    * Parses Wowhead detail source information.
    * The source is either a drop + drop chance (Boss, Zone Drop or Rare Drop) or a quest (A/H)
-   * Drops are stored inside the 'dropped-by', quests inside the 'rewarded-from-q' ListView().
+   * Drops are stored inside the 'dropped-by', quests inside the 'reward-from-q' ListView().
    */
   async parseWowheadDetailSource (req, item) {
     const $ = cheerio.load(req.body)
@@ -466,7 +462,7 @@ class Build {
       const listViews = content.split('new Listview({')
       for (const listView of listViews) {
         const droppedBy = listView.includes('id: \'dropped-by\'')
-        const rewardedFrom = listView.includes('id: \'rewarded-from-q\'')
+        const rewardedFrom = listView.includes('id: \'reward-from-q\'')
         if (!droppedBy && !rewardedFrom) continue
 
         const props = listView.split('\n')
@@ -475,12 +471,35 @@ class Build {
 
           const data = JSON.parse(prop.slice(prop.indexOf('data:') + 5, -1))
 
+          // Process quest reward (takes precedence over drops)
+          if (rewardedFrom) {
+            const faction = {
+              1: 'Alliance',
+              2: 'Horde',
+              3: 'Both'
+            }
+
+            const quests = []
+            for (const quest of data) {
+              quests.push({
+                questId: quest.id,
+                name: quest.name,
+                faction: faction[quest.side]
+              })
+            }
+
+            item.source = {
+              category: 'Quest',
+              quests
+            }
+          }
+
           // Process dropped by
           // If one zone and one enemy: Boss
           // If one zone but multiple enemies: Zone Drop
           // If multiple zones: Rare Drop
           // Percentages are averaged
-          if (droppedBy) {
+          else {
             let locations = []
             let chanceAcc = 0
             let name = ''
