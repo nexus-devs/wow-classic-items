@@ -6,6 +6,7 @@ const colors = require('colors/safe')
 
 class Build {
   constructor (blizzardToken = 'blizzard_token') {
+    // Item pipeline
     this.pipeline = [
       { name: 'base_items', fn: this.scrapeWowheadListing },
       { name: 'item_desc', fn: this.scrapeBlizzardAPI.bind(this) },
@@ -25,6 +26,11 @@ class Build {
    * Starts the build process.
    */
   async start () {
+    // Run zones
+    const zones = this.scrapeWowheadZones()
+    this.saveJSON('build/zones.json', zones)
+
+    // Run item pipeline
     let stageResult
     for (const stage of this.pipeline) {
       stageResult = await stage.fn(stageResult)
@@ -81,6 +87,53 @@ class Build {
     }
 
     return items
+  }
+
+  /**
+   * Scrapes all zone related information
+   */
+  async scrapeWowheadZones () {
+    const zones = []
+
+    const progress = new ProgressBar('Fetching zones', 82)
+    const req = await request({
+      url: `https://classic.wowhead.com/zones`,
+      json: true
+    })
+
+    // Wowhead uses JavaScript to load in their table content, so we'd need something like Selenium to get the HTML.
+    // However, that is really painful and slow. Fortunately, with some parsing the table content is available in the source code.
+    const $ = cheerio.load(req.body)
+    const zoneDataRaw = $('script[type="text/javascript"]').get()[0].children[0].data.split('\n')[1].slice(33, -1)
+    const zoneData = JSON.parse(zoneDataRaw)
+
+    // Hardcode taken from Wowhead
+    const territory = {
+      0: 'Alliance',
+      1: 'Horde',
+      2: 'Contested',
+      4: 'PvP'
+    }
+    const category = {
+      1: 'Open World',
+      2: 'Dungeon',
+      3: 'Raid',
+      6: 'Battleground'
+    }
+
+    for (const zone of zoneData) {
+      zones.push({
+        id: zone.id,
+        name: zone.name,
+        category: category[zone.category],
+        level: [zone.minlevel, zone.maxlevel],
+        territory: territory[zone.territory]
+      })
+
+      progress.tick()
+    }
+
+    return zones
   }
 
   /**
