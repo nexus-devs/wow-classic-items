@@ -18,6 +18,7 @@ npm install wow-classic-items
 const Database = require('wow-classic-items')
 const items = new Database.Items(options)
 const professions = new Database.Professions(options)
+const zones = new Database.Zones(options)
 ```
 `items` is functionally identical to an array and can be used as such:
 ```js
@@ -54,7 +55,7 @@ professions.get('Alchemy') // .get returns specified profession
     name: 'Some Random Boss', // Only set on Boss Drop
     zone: [209], // Only set on Zone Drop
     dropChance: 0.33, // Only set on Drops
-    quests: [{ questId: 256, name: 'Some Random Quest' }] // Only set on Quest
+    quests: [{ questId: 256, name: 'Some Random Quest', faction: 'Horde' }] // Only set on Quest
   }
 }, ...]
 ```

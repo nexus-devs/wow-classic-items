@@ -86,4 +86,13 @@ class Professions extends Database {
   }
 }
 
-module.exports = { Items, Professions }
+/**
+ * Zone Database
+ */
+class Zones extends Database {
+  constructor (options) {
+    super('zones', options)
+  }
+}
+
+module.exports = { Items, Professions, Zones }
