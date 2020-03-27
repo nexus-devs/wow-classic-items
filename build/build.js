@@ -211,9 +211,14 @@ class Build {
         this.parseWowheadDetailTooltip(req, item),
         this.parseWowheadDetailItemLink(req, item),
         this.parseWowheadDetailVendor(req, item),
-        this.parseWowheadDetailContentPhase(req, item)
+        this.parseWowheadDetailContentPhase(req, item),
+        this.parseWowheadDetailSource(req, item)
       ])
     }
+
+    await applyCraftingInfo(input.find(i => i.itemId === 14148))
+    console.log(input.find(i => i.itemId === 14148))
+    return
 
     let parallel = []
     const batchSize = 200
@@ -446,6 +451,66 @@ class Build {
   }
 
   /**
+   * Parses Wowhead detail source information.
+   * The source is either a drop + drop chance (Boss, Zone Drop or Rare Drop) or a quest (A/H)
+   * Drops are stored inside the 'dropped-by', quests inside the 'rewarded-from-q' ListView().
+   */
+  async parseWowheadDetailSource (req, item) {
+    const $ = cheerio.load(req.body)
+    const tableContentRaw = $('script[type="text/javascript"]').get()
+
+    for (const contentRaw of tableContentRaw) {
+      const content = contentRaw.children[0].data
+      if (!content.includes('new Listview({')) continue
+
+      const listViews = content.split('new Listview({')
+      for (const listView of listViews) {
+        const droppedBy = listView.includes('id: \'dropped-by\'')
+        const rewardedFrom = listView.includes('id: \'rewarded-from-q\'')
+        if (!droppedBy && !rewardedFrom) continue
+
+        const props = listView.split('\n')
+        for (const prop of props) {
+          if (!prop.includes('data: [')) continue
+
+          const data = JSON.parse(prop.slice(prop.indexOf('data:') + 5, -1))
+
+          // Process dropped by
+          // If one zone and one enemy: Boss
+          // If one zone but multiple enemies: Zone Drop
+          // If multiple zones: Rare Drop
+          // Percentages are averaged
+          if (droppedBy) {
+            let locations = []
+            let chanceAcc = 0
+            let name = ''
+            for (const drop of data) {
+              if (!drop.location) continue
+              locations = locations.concat(drop.location)
+              chanceAcc += (drop.count / drop.outof) * drop.location.length
+              name = drop.name
+            }
+
+            const num = locations.length
+            if (!num) continue
+
+            const zones = [...new Set(locations)]
+            const dropChance = Math.round((chanceAcc / num) * 10000) / 10000
+            const category = num > 1 ? (zones.length > 1 ? 'Rare Drop' : 'Zone Drop') : 'Boss Drop'
+
+            item.source = {
+              category,
+              name: category === 'Boss Drop' ? name : undefined,
+              zone: category === 'Zone Drop' ? zones[0] : undefined,
+              dropChance
+            }
+          }
+        }
+      }
+    }
+  }
+
+  /**
    * Parses Wowhead detail vendor information.
    * Vendoring information is stored inside the 'sold-by' ListView().
    * The vendor price is a weighted average of all the infinite stock prices, weighted by popularity
@@ -529,4 +594,5 @@ class Build {
 }
 
 const build = new Build()
-build.start()
+// build.start()
+build.step('item_details', 'build/data.json', 'json/data.json')
