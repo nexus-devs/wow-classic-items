@@ -11,6 +11,9 @@ Fetches all WoW Classic items and professions from Wowhead and the official Bliz
 npm install wow-classic-items
 ```
 
+This package is currently laid out for node.js, as this is what we're using in production. However, if you need the database available for another language, simply read in the JSON yourself from `/data/json`
+
+
 <br>
 
 ### Usage
