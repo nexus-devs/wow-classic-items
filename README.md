@@ -56,7 +56,7 @@ professions.get('Alchemy') // .get returns specified profession
   source: { // Source, either Boss Drop, Rare Drop, Zone Drop or Quest
     category: 'Boss Drop',
     name: 'Some Random Boss', // Only set on Boss Drop
-    zone: [209], // Only set on Zone Drop
+    zone: [209], // Only set on Zone Drop or Boss Drop
     dropChance: 0.33, // Only set on Drops
     quests: [{ questId: 256, name: 'Some Random Quest', faction: 'Horde' }] // Only set on Quest
   }

@@ -520,7 +520,7 @@ class Build {
             item.source = {
               category,
               name: category === 'Boss Drop' ? name : undefined,
-              zone: category === 'Zone Drop' ? zones[0] : undefined,
+              zone: category === 'Zone Drop' || category === 'Boss Drop' ? zones[0] : undefined,
               dropChance
             }
           }
@@ -613,4 +613,5 @@ class Build {
 }
 
 const build = new Build()
-build.start()
+// build.start()
+build.step('item_details', 'build/data.json', 'json/data.json')
