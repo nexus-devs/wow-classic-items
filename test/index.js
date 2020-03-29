@@ -41,14 +41,24 @@ describe('index.js', function () {
     assert(wowheadItem.icon === `https://wow.zamimg.com/images/wow/icons/large/${baseItem.icon}.jpg`)
   })
 
+  it('should parse item link correctly', function () {
+    const items = new Database.Items({ iconSrc: false })
+    const link = items.getItemLink(13510)
+    assert(link === '/script DEFAULT_CHAT_FRAME:AddMessage("\\124cffffffff\\124Hitem:13510::::::::::0\\124h[Flask of the Titans]\\124h\\124r");')
+  })
+
   it('should get professions correctly', function () {
     const professions = new Database.Professions()
     assert(professions.get('Alchemy').name === 'Alchemy')
   })
 
-  it('should parse item link correctly', function () {
-    const items = new Database.Items({ iconSrc: false })
-    const link = items.getItemLink(13510)
-    assert(link === '/script DEFAULT_CHAT_FRAME:AddMessage("\\124cffffffff\\124Hitem:13510::::::::::0\\124h[Flask of the Titans]\\124h\\124r");')
+  it('should get zones correctly', function () {
+    const zones = new Database.Zones()
+    assert(zones.find(z => z.id === 1977).name === 'Zul\'Gurub')
+  })
+
+  it('should get classes correctly', function () {
+    const classes = new Database.Classes()
+    assert(classes.get('Druid').name === 'Druid')
   })
 })

@@ -7,7 +7,7 @@
     "build": "node ./build/build.js",
     "validate": "node ./build/validate.js",
     "test": "mocha -s 10000 --timeout 10000",
-    "lint": "eslint --ignore-path .gitignore ."
+    "lint": "eslint ."
   },
   "repository": {
     "type": "git",

@@ -97,7 +97,7 @@ class Build {
 
     const progress = new ProgressBar('Fetching zones', 82)
     const req = await request({
-      url: `https://classic.wowhead.com/zones`,
+      url: 'https://classic.wowhead.com/zones',
       json: true
     })
 
