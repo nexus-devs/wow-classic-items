@@ -96,4 +96,22 @@ class Zones extends Database {
   }
 }
 
-module.exports = { Items, Professions, Zones }
+/**
+ * Class Database
+ */
+class Classes extends Database {
+  constructor (options) {
+    const opts = { ...defaultOptions, ...options } // Merge options
+    if (opts.iconSrc === 'blizzard') opts.iconSrc = 'wowhead' // Change Blizzard source to Wowhead because Blizzard doesn't expose these icons (to my knowledge)
+    super('classes', opts)
+  }
+
+  /**
+   * Really small wrapper class to make classes accessible via .get('className')
+   */
+  get (name) {
+    return this.find((p) => p.name === name)
+  }
+}
+
+module.exports = { Items, Professions, Zones, Classes }
