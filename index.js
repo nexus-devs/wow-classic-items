@@ -91,6 +91,7 @@ class Professions extends Database {
  */
 class Zones extends Database {
   constructor (options) {
+    options = {...options, iconSrc: false} // Disable icons because zones don't have one
     super('zones', options)
   }
 }
