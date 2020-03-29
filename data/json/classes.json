@@ -1,0 +1,9 @@
+[{"name": "Druid", "color":  "#FF7D0A", "icon": "classicon_druid"},
+{"name": "Hunter", "color":  "#ABD473", "icon": "classicon_hunter"},
+{"name": "Mage", "color":  "#69CCF0", "icon": "classicon_mage"},
+{"name": "Paladin", "color":  "#F58CBA", "icon": "classicon_paladin"},
+{"name": "Priest", "color":  "#FFFFFF", "icon": "classicon_priest"},
+{"name": "Rogue", "color":  "#FFF569", "icon": "classicon_rogue"},
+{"name": "Shaman", "color":  "#0070DE", "icon": "classicon_shaman"},
+{"name": "Warlock", "color":  "#9482C9", "icon": "classicon_warlock"},
+{"name": "Warrior", "color":  "#C79C6E", "icon": "classicon_warrior"}]
