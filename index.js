@@ -103,7 +103,18 @@ class Classes extends Database {
   constructor (options) {
     const opts = { ...defaultOptions, ...options } // Merge options
     if (opts.iconSrc === 'blizzard') opts.iconSrc = 'wowhead' // Change Blizzard source to Wowhead because Blizzard doesn't expose these icons (to my knowledge)
+
     super('classes', opts)
+
+    // Spec icons
+    if (opts.iconSrc === 'wowhead') {
+      for (const el of this) {
+        el.specs = el.specs.map((x) => {
+          x.icon = `https://wow.zamimg.com/images/wow/icons/large/${x.icon}.jpg`
+          return x
+        })
+      }
+    }
   }
 
   /**

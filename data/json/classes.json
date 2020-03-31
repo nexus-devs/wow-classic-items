@@ -1,9 +1,46 @@
-[{"name": "Druid", "color":  "#FF7D0A", "icon": "classicon_druid"},
-{"name": "Hunter", "color":  "#ABD473", "icon": "classicon_hunter"},
-{"name": "Mage", "color":  "#69CCF0", "icon": "classicon_mage"},
-{"name": "Paladin", "color":  "#F58CBA", "icon": "classicon_paladin"},
-{"name": "Priest", "color":  "#FFFFFF", "icon": "classicon_priest"},
-{"name": "Rogue", "color":  "#FFF569", "icon": "classicon_rogue"},
-{"name": "Shaman", "color":  "#0070DE", "icon": "classicon_shaman"},
-{"name": "Warlock", "color":  "#9482C9", "icon": "classicon_warlock"},
-{"name": "Warrior", "color":  "#C79C6E", "icon": "classicon_warrior"}]
+[{"name": "Druid", "color":  "#FF7D0A", "icon": "classicon_druid", "specs": [
+  { "name": "Balance", "icon": "spell_nature_starfall" },
+  { "name": "Feral", "icon": "ability_druid_catform" },
+  { "name": "Bear", "icon": "ability_racial_bearform" },
+  { "name": "Restoration", "icon": "spell_nature_healingtouch" }
+]},
+{"name": "Hunter", "color":  "#ABD473", "icon": "classicon_hunter", "specs": [
+  { "name": "Beast Mastery", "icon": "ability_hunter_bestialdiscipline" },
+  { "name": "Marksmanship", "icon": "ability_hunter_focusedaim" },
+  { "name": "Survival", "icon": "ability_hunter_camouflage" }
+]},
+{"name": "Mage", "color":  "#69CCF0", "icon": "classicon_mage", "specs": [
+  { "name": "Arcane", "icon": "spell_holy_magicalsentry" },
+  { "name": "Fire", "icon": "spell_fire_firebolt02" },
+  { "name": "Frost", "icon": "spell_frost_frostbolt02" }
+]},
+{"name": "Paladin", "color":  "#F58CBA", "icon": "classicon_paladin", "specs": [
+  { "name": "Holy", "icon": "spell_holy_holybolt" },
+  { "name": "Protection", "icon": "ability_paladin_shieldofthetemplar" },
+  { "name": "Retribution", "icon": "spell_holy_auraoflight" }
+]},
+{"name": "Priest", "color":  "#FFFFFF", "icon": "classicon_priest", "specs": [
+  { "name": "Discipline", "icon": "spell_holy_powerwordshield" },
+  { "name": "Holy", "icon": "spell_holy_guardianspirit" },
+  { "name": "Shadow", "icon": "spell_shadow_shadowwordpain" }
+]},
+{"name": "Rogue", "color":  "#FFF569", "icon": "classicon_rogue", "specs": [
+  { "name": "Assassination", "icon": "ability_rogue_eviscerate" },
+  { "name": "Combat", "icon": "ability_backstab" },
+  { "name": "Subtlety", "icon": "ability_stealth" }
+]},
+{"name": "Shaman", "color":  "#0070DE", "icon": "classicon_shaman", "specs": [
+  { "name": "Restoration", "icon": "spell_nature_magicimmunity" },
+  { "name": "Enhancement", "icon": "spell_shaman_improvedstormstrike" },
+  { "name": "Elemental", "icon": "spell_nature_lightning" }
+]},
+{"name": "Warlock", "color":  "#9482C9", "icon": "classicon_warlock", "specs": [
+  { "name": "Affliction", "icon": "spell_shadow_deathcoil" },
+  { "name": "Demonology", "icon": "spell_shadow_metamorphosis" },
+  { "name": "Destruction", "icon": "spell_shadow_rainoffire" }
+]},
+{"name": "Warrior", "color":  "#C79C6E", "icon": "classicon_warrior", "specs": [
+  { "name": "Arms", "icon": "ability_warrior_savageblow" },
+  { "name": "Fury", "icon": "ability_warrior_innerrage" },
+  { "name": "Protection", "icon": "ability_warrior_defensivestance" }
+]}]
