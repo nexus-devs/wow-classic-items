@@ -61,8 +61,8 @@ class Build {
 
     // Filter the items by ID (total ID range about 24000).
     const stepSize = 500 // Wowhead can only show about 500 items per page.
-    const progress = new ProgressBar('Fetching base items', 24000 / stepSize)
-    for (let i = 0; i < 24000; i += stepSize) {
+    const progress = new ProgressBar('Fetching base items', 24500 / stepSize)
+    for (let i = 0; i < 24500; i += stepSize) {
       const req = await request({
         url: `https://classic.wowhead.com/items?filter=162:151:151;2:2:5;0:${i}:${i + stepSize}`,
         json: true
@@ -614,4 +614,4 @@ class Build {
 
 const build = new Build()
 // build.start()
-build.step('item_details', 'build/data.json', 'json/data.json')
+build.step('base_items', 'tmp/1_base_items.json')
