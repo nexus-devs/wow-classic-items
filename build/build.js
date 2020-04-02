@@ -448,8 +448,8 @@ class Build {
 
   /**
    * Parses Wowhead detail source information.
-   * The source is either a drop + drop chance (Boss, Zone Drop or Rare Drop) or a quest (A/H)
-   * Drops are stored inside the 'dropped-by', quests inside the 'reward-from-q' ListView().
+   * The source is either a drop + drop chance (Boss, Zone Drop or Rare Drop) or a quest (A/H) or vendor source.
+   * Drops are stored inside the 'dropped-by', quests inside the 'reward-from-q' and vendor inside 'sold-by' ListView().
    */
   async parseWowheadDetailSource (req, item) {
     const $ = cheerio.load(req.body)
@@ -463,7 +463,8 @@ class Build {
       for (const listView of listViews) {
         const droppedBy = listView.includes('id: \'dropped-by\'')
         const rewardedFrom = listView.includes('id: \'reward-from-q\'')
-        if (!droppedBy && !rewardedFrom) continue
+        const soldBy = listView.includes('id: \'sold-by\'')
+        if (!droppedBy && !rewardedFrom && !soldBy) continue
 
         const props = listView.split('\n')
         for (const prop of props) {
@@ -499,7 +500,7 @@ class Build {
           // If one zone but multiple enemies: Zone Drop
           // If multiple zones: Rare Drop
           // Percentages are averaged
-          else {
+          else if (droppedBy) {
             let locations = []
             let chanceAcc = 0
             let name = ''
@@ -522,6 +523,26 @@ class Build {
               name: category === 'Boss Drop' ? name : undefined,
               zone: category === 'Zone Drop' || category === 'Boss Drop' ? zones[0] : undefined,
               dropChance
+            }
+          }
+
+          // Process vendor
+          // Drop if theres more than one vendor
+          else {
+            if (data.length > 1) continue
+            const vendor = data[0]
+            const vendorToAlliance = vendor.react && vendor.react[0] === 1
+            const vendorToHorde = vendor.react && vendor.react[1] === 1
+
+            let faction = 'Both'
+            if (!vendorToAlliance && vendorToHorde) faction = 'Horde'
+            else if (!vendorToHorde && vendorToAlliance) faction = 'Alliance'
+
+            item.source = {
+              category: 'Vendor',
+              name: vendor.name,
+              faction,
+              cost: vendor.cost[0]
             }
           }
         }
@@ -614,4 +635,4 @@ class Build {
 
 const build = new Build()
 // build.start()
-build.step('base_items', 'tmp/1_base_items.json')
+build.step('unique_names', 'build/data.json', 'tmp/3_item_details.json')
