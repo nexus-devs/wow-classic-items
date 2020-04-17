@@ -11,6 +11,17 @@ Current content:
 * Zones
 * Classes
 
+Currently used in production over at:
+
+<table>
+<tbody>
+    <tr>
+        <td><a href="https://nexushub.co"><img src="https://nexushub.co/img/brand/nexushub-logo-typeface-color.svg" alt="NexusHub" width="150" /></a></td>        
+        <td><a href="https://www.wowclassicbis.com/twink/"><img src="https://www.wowclassicbis.com/twink/img/logo.718b6e5b.svg" alt="Twinktool" width="150" /></a></td>
+    </tr>
+</tbody>
+</table>
+
 <br>
 
 ### Installation
