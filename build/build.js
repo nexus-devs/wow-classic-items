@@ -136,6 +136,108 @@ class Build {
     return zones
   }
 
+
+  /**
+   * Get talent data from wowhead
+   */
+  async scrapeWowheadTalents() {
+    const talents = []
+    const noTalentData = [16958, 16952, 16954, 13707, 13966, 13967, 13968, 13969, 16189, 16253, 16298, 18748, 18749, 18750, 18128, 18129]
+
+    // Filter the talents by ID (total ID range for talents spells is about 31000).
+    const stepSize = 1000 // Wowhead can show about 1000 talents per page.
+    const progress = new ProgressBar('Fetching talents', 31000 / stepSize)
+
+    for (let i = 0; i < 31000; i += stepSize) {
+      const req = await request({
+        url: `https://classic.wowhead.com/talents?filter=14:14;2:5;${i}:${i + stepSize}`,
+        json: true
+      })
+
+      // Wowhead uses JavaScript to load in their table content, so we'd need something like Selenium to get the HTML.
+      // However, that is really painful and slow. Fortunately, with some parsing the table content is available in the source code.
+      const $ = cheerio.load(req.body)
+
+      // Talents are spells and they have a wide range of ids from about 700-31000. Some steps return no data - check for that
+      if ($('script[type="text/javascript"]').get().length > 1) {
+        const tableContentRawData = $('script[type="text/javascript"]').get()[1].children[0].data.split('\n');
+        // splitIndex is a hack due to an anomaly in the data wowhead returns. Soul shard gets returned as a separate object
+        // at index 1 when Shadowburn talent is in the response data
+        // If soul shard is detected at index 1, begin at index 2, Soul shard begins with "WH.Gatherer.addData(3"
+        const splitIndex = (parseInt(tableContentRawData[1].slice(20, 21)) === 3) ? 2 : 1
+        const tableContentRaw = tableContentRawData[splitIndex].slice(26, -2)
+        const tableContent = JSON.parse(tableContentRaw)
+
+        for (const key of Object.keys(tableContent)) {
+          const item = tableContent[key]
+          talents.push({
+            id: parseInt(key),
+            name: item.name_enus
+          })
+        }
+      }
+
+      progress.tick()
+    }
+
+    return talents
+
+  }
+
+  async reformatTooltips(arr) {
+
+    let result = {}
+
+    for (let index = 0; index < arr.length; index++) {
+      const element = arr[index];
+      let elementid = parseInt(element.id);
+
+
+      console.log(elementid, element.id)
+
+      delete element.id;
+
+
+      result[elementid] = element
+    }
+
+    return result
+  }
+
+  /**
+   * Get talent tooltips from wowhead
+   */
+  async c(input) {
+    const applyCraftingInfo = async (talent) => {
+      const req = await request({
+        url: `https://classic.wowhead.com/spell=${talent.id}`,
+        json: true
+      })
+
+      // If you add anything to this, make sure they don't overwrite talent properties from each other
+      await Promise.all([
+        this.parseWowheadDetailTooltip(req, talent)
+      ])
+    }
+
+    let parallel = []
+    const batchSize = 200
+    const progress = new ProgressBar('Fetching talent details', (input.length / batchSize) + 1)
+    for (let i = 0; i < input.length; i++) {
+      const item = input[i]
+      parallel.push(applyCraftingInfo(item))
+      if (parallel.length >= batchSize || i === input.length - 1) {
+        await Promise.all(parallel)
+        progress.tick()
+        parallel = []
+      }
+    }
+
+    progress.tick()
+
+    return input
+  }
+
   /**
    * Scrapes the information of the official Blizzard API (Requires an API key)
    * Updates the given data with more description (class, subclass, sellPrice, quality, itemLevel, requiredLevel, slot)
@@ -635,4 +737,7 @@ class Build {
 
 const build = new Build()
 // build.start()
-build.step('unique_names', 'build/data.json', 'tmp/3_item_details.json')
+// build.step('unique_names', 'build/data.json', 'tmp/3_item_details.json')
+// build.step('talents', 'talents_test.json')
+// build.step('talent_details', 'talent_tooltips.json', 'talents_test.json' )
+build.step('reformat_data', 'talent_tooltips_new.json', 'talent_tooltips.json')
