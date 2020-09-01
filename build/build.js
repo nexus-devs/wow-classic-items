@@ -526,7 +526,7 @@ class Build {
    */
   async parseWowheadDetailItemLink (req, item) {
     const itemLinkRaw = req.body.split('\n').find((line) => line.includes('onclick="WH.Links.show(this, {&quot;linkColor'))
-    const itemLinkString = itemLinkRaw.split('onclick="WH.Links.show(this, ')[1].slice(0, -19).replace(/&quot;/g, '"')
+    const itemLinkString = itemLinkRaw.split('onclick="WH.Links.show(this, ')[1].slice(0, -26).replace(/&quot;/g, '"')
     const itemLinkData = JSON.parse(itemLinkString)
     item.itemLink = `|c${itemLinkData.linkColor}|H${itemLinkData.linkId}|h[${itemLinkData.linkName}]|h|r`
   }
