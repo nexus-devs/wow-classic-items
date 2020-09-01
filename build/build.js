@@ -307,7 +307,6 @@ class Build {
 
     const item = input.find(i => i.itemId === 19019)
     await applyCraftingInfo(item)
-    console.log(item)
     return
 
     let parallel = []
@@ -469,7 +468,7 @@ class Build {
     const tooltip = []
     for (let label of labelsRaw) {
       if (label.trim() === '') continue // Filter empty labels
-      label = label.replace(/&quot;/g, '"').replace(/&lt;/g, '<').replace(/&gt;/g, '>')
+      label = label.replace(/&quot;/g, '"').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&nbsp;/g, String.fromCharCode(160))
 
       if (currentlyOnSellprice) {
         if (!isNaN(parseInt(label))) continue
