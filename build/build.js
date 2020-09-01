@@ -6,12 +6,20 @@ const colors = require('colors/safe')
 
 class Build {
   constructor (blizzardToken = 'blizzard_token') {
+    this.pipeline = {}
+
     // Item pipeline
-    this.pipeline = [
+    this.pipeline.items = [
       { name: 'base_items', fn: this.scrapeWowheadListing },
       { name: 'item_desc', fn: this.scrapeBlizzardAPI.bind(this) },
       { name: 'item_details', fn: this.scrapeWowheadDetail.bind(this) },
       { name: 'unique_names', fn: this.addUniqueNames }
+    ]
+
+    // Spell pipeline
+    this.pipeline.spells = [
+      { name: 'base_talents', fn: this.scrapeWowheadTalents },
+      { name: 'talent_details', fn: this.scrapeWowheadTalentsDetail.bind(this) }
     ]
 
     try {
@@ -30,20 +38,22 @@ class Build {
     const zones = this.scrapeWowheadZones()
     this.saveJSON('build/zones.json', zones)
 
-    // Run item pipeline
-    let stageResult
-    for (const stage of this.pipeline) {
-      stageResult = await stage.fn(stageResult)
+    // Run all pipelines
+    for (const pipeline of Object.keys(this.pipeline)) {
+      let stageResult
+      for (const stage of this.pipeline[pipeline]) {
+        stageResult = await stage.fn(stageResult)
+      }
+      this.saveJSON(`build/${pipeline}.json`, stageResult)
     }
-    this.saveJSON('build/data.json', stageResult)
   }
 
   /**
    * Only perform a single step of the whole pipeline, with a specified output or input file.
    */
-  async step (step, fileOut, fileIn = false) {
+  async step (pipeline, step, fileOut, fileIn = false) {
     const transform = (name) => name.replace(/_/g, '').toLowerCase() // Helper function so naming conventions don't conflict
-    for (const stage of this.pipeline) {
+    for (const stage of this.pipeline[pipeline]) {
       if (transform(stage.name) === transform(step)) {
         const result = await stage.fn(fileIn ? this.readJSON(fileIn) : undefined)
         if (fileOut) this.saveJSON(fileOut, result)
@@ -136,13 +146,11 @@ class Build {
     return zones
   }
 
-
   /**
    * Get talent data from wowhead
    */
-  async scrapeWowheadTalents() {
+  async scrapeWowheadTalents () {
     const talents = []
-    const noTalentData = [16958, 16952, 16954, 13707, 13966, 13967, 13968, 13969, 16189, 16253, 16298, 18748, 18749, 18750, 18128, 18129]
 
     // Filter the talents by ID (total ID range for talents spells is about 31000).
     const stepSize = 1000 // Wowhead can show about 1000 talents per page.
@@ -181,33 +189,12 @@ class Build {
     }
 
     return talents
-
-  }
-
-  async reformatTooltips(arr) {
-
-    let result = {}
-
-    for (let index = 0; index < arr.length; index++) {
-      const element = arr[index];
-      let elementid = parseInt(element.id);
-
-
-      console.log(elementid, element.id)
-
-      delete element.id;
-
-
-      result[elementid] = element
-    }
-
-    return result
   }
 
   /**
    * Get talent tooltips from wowhead
    */
-  async c(input) {
+  async scrapeWowheadTalentsDetail (input) {
     const applyCraftingInfo = async (talent) => {
       const req = await request({
         url: `https://classic.wowhead.com/spell=${talent.id}`,
@@ -740,4 +727,5 @@ const build = new Build()
 // build.step('unique_names', 'build/data.json', 'tmp/3_item_details.json')
 // build.step('talents', 'talents_test.json')
 // build.step('talent_details', 'talent_tooltips.json', 'talents_test.json' )
-build.step('reformat_data', 'talent_tooltips_new.json', 'talent_tooltips.json')
+// build.step('reformat_data', 'talent_tooltips_new.json', 'talent_tooltips.json')
+build.step('spells', 'base_talents', 'tmp/base_talents.json')
