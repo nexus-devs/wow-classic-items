@@ -305,6 +305,11 @@ class Build {
       ])
     }
 
+    const item = input.find(i => i.itemId === 19019)
+    await applyCraftingInfo(item)
+    console.log(item)
+    return
+
     let parallel = []
     const batchSize = 200
     const progress = new ProgressBar('Fetching item details', (input.length / batchSize) + 1)
@@ -368,7 +373,7 @@ class Build {
     const tableContentRaw = $('script[type="text/javascript"]').get()
     let foundCreatedBy = false
     for (const contentRaw of tableContentRaw) {
-      const content = contentRaw.children[0].data
+      const content = contentRaw.children.length ? contentRaw.children[0].data : ''
       if (!content.includes('new Listview({')) continue
 
       const listViews = content.split('new Listview({')
@@ -417,7 +422,7 @@ class Build {
     const $ = cheerio.load(req.body)
     const tableContentRaw = $('script[type="text/javascript"]').get()
     for (const contentRaw of tableContentRaw) {
-      const content = contentRaw.children[0].data
+      const content = contentRaw.children.length ? contentRaw.children[0].data : ''
       if (!content.includes('new Listview({')) continue
 
       const listViews = content.split('new Listview({')
@@ -545,7 +550,7 @@ class Build {
     const tableContentRaw = $('script[type="text/javascript"]').get()
 
     for (const contentRaw of tableContentRaw) {
-      const content = contentRaw.children[0].data
+      const content = contentRaw.children.length ? contentRaw.children[0].data : ''
       if (!content.includes('new Listview({')) continue
 
       const listViews = content.split('new Listview({')
@@ -648,7 +653,7 @@ class Build {
     const $ = cheerio.load(req.body)
     const tableContentRaw = $('script[type="text/javascript"]').get()
     for (const contentRaw of tableContentRaw) {
-      const content = contentRaw.children[0].data
+      const content = contentRaw.children.length ? contentRaw.children[0].data : ''
       if (!content.includes('new Listview({')) continue
 
       const listViews = content.split('new Listview({')
@@ -728,4 +733,4 @@ const build = new Build()
 // build.step('talents', 'talents_test.json')
 // build.step('talent_details', 'talent_tooltips.json', 'talents_test.json' )
 // build.step('reformat_data', 'talent_tooltips_new.json', 'talent_tooltips.json')
-build.step('items', 'base_items', 'tmp/base_items.json')
+build.step('items', 'item_details', 'tmp/item_details.json', 'tmp/item_desc.json')
