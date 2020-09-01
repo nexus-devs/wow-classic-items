@@ -114,7 +114,7 @@ class Build {
     // Wowhead uses JavaScript to load in their table content, so we'd need something like Selenium to get the HTML.
     // However, that is really painful and slow. Fortunately, with some parsing the table content is available in the source code.
     const $ = cheerio.load(req.body)
-    const zoneDataRaw = $('script[type="text/javascript"]').get()[1].children[0].data.split('\n')[1].slice(33, -1)
+    const zoneDataRaw = $('script[type="text/javascript"]').get()[1].children[0].data.split('\n')[1].slice(121, -3)
     const zoneData = JSON.parse(zoneDataRaw)
 
     // Hardcode taken from Wowhead
@@ -304,10 +304,6 @@ class Build {
         this.parseWowheadDetailSource(req, item)
       ])
     }
-
-    const item = input.find(i => i.itemId === 19019)
-    await applyCraftingInfo(item)
-    return
 
     let parallel = []
     const batchSize = 200
@@ -727,9 +723,4 @@ class Build {
 }
 
 const build = new Build()
-// build.start()
-// build.step('unique_names', 'build/data.json', 'tmp/3_item_details.json')
-// build.step('talents', 'talents_test.json')
-// build.step('talent_details', 'talent_tooltips.json', 'talents_test.json' )
-// build.step('reformat_data', 'talent_tooltips_new.json', 'talent_tooltips.json')
-build.step('items', 'item_details', 'tmp/item_details.json', 'tmp/item_desc.json')
+build.start()
