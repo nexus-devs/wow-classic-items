@@ -81,7 +81,7 @@ class Build {
       // Wowhead uses JavaScript to load in their table content, so we'd need something like Selenium to get the HTML.
       // However, that is really painful and slow. Fortunately, with some parsing the table content is available in the source code.
       const $ = cheerio.load(req.body)
-      const tableContentRaw = $('script[type="text/javascript"]').get()[0].children[0].data.split('\n')[1].slice(26, -2)
+      const tableContentRaw = $('script[type="text/javascript"]').get()[1].children[0].data.split('\n')[1].slice(26, -2)
       const tableContent = JSON.parse(tableContentRaw)
 
       for (const key of Object.keys(tableContent)) {
@@ -114,7 +114,7 @@ class Build {
     // Wowhead uses JavaScript to load in their table content, so we'd need something like Selenium to get the HTML.
     // However, that is really painful and slow. Fortunately, with some parsing the table content is available in the source code.
     const $ = cheerio.load(req.body)
-    const zoneDataRaw = $('script[type="text/javascript"]').get()[0].children[0].data.split('\n')[1].slice(33, -1)
+    const zoneDataRaw = $('script[type="text/javascript"]').get()[1].children[0].data.split('\n')[1].slice(33, -1)
     const zoneData = JSON.parse(zoneDataRaw)
 
     // Hardcode taken from Wowhead
@@ -728,4 +728,4 @@ const build = new Build()
 // build.step('talents', 'talents_test.json')
 // build.step('talent_details', 'talent_tooltips.json', 'talents_test.json' )
 // build.step('reformat_data', 'talent_tooltips_new.json', 'talent_tooltips.json')
-build.step('spells', 'talent_details', 'tmp/detail_talents.json', 'tmp/base_talents.json')
+build.step('items', 'base_items', 'tmp/base_items.json')
