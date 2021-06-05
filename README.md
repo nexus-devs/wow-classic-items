@@ -128,9 +128,9 @@ npm run build
 ```
 The professions database is currently handmade.
 
-After that you can verify the build and/or check the changes between yours and the current one with:
+After that you can validate the build and/or check the changes between yours and the current one with:
 ```
-npm run verify
+npm run validate
 ```
 Test the item class with:
 ```
