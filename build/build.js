@@ -604,7 +604,7 @@ class Build {
             for (const drop of data) {
               if (!drop.location) continue
               locations = locations.concat(drop.location)
-              chanceAcc += (drop.count / drop.outof) * drop.location.length
+              chanceAcc += (drop.percentOverride ? drop.percentOverride / 100 : (drop.count / drop.outof)) * drop.location.length
               name = drop.name
             }
 
