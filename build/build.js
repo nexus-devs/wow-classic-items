@@ -10,7 +10,7 @@ class Build {
     this.pipeline = {}
 
     // Zones pipeline
-    this.pipeline.zones = [{ name: "zones", fn: this.scrapeWowheadZones }];
+    this.pipeline.zones = [{ name: 'zones', fn: this.scrapeWowheadZones }]
 
     // Item pipeline
     this.pipeline.items = [
@@ -27,7 +27,7 @@ class Build {
     ]
 
     try {
-      this.blizzardToken = fs.readFileSync(path.join(__dirname, "..", blizzardToken), 'utf8').trim()
+      this.blizzardToken = fs.readFileSync(path.join(__dirname, '..', blizzardToken), 'utf8').trim()
     } catch (err) {
       if (err.code !== 'ENOENT') throw err // Don't throw error if file simply doesn't exist
       else this.warn('Blizzard Token could not be found')
@@ -83,8 +83,8 @@ class Build {
       const $ = cheerio.load(req.body)
 
       const scripts = $('script[type="text/javascript"]').get() // The range 36000-36500 has no data and cause a TypeError, pull scripts out so that we can check whether data exists.
-      
-      if(scripts[1]) { 
+
+      if (scripts[1]) {
         const tableContentRaw = scripts[1].children[0].data.split('\n')[1].slice(26, -2)
         const tableContent = JSON.parse(tableContentRaw)
 
@@ -127,7 +127,7 @@ class Build {
       0: 'Alliance',
       1: 'Horde',
       2: 'Contested',
-      3: "Sanctuary",
+      3: 'Sanctuary',
       4: 'PvP'
     }
     const category = {
@@ -135,7 +135,7 @@ class Build {
       2: 'Dungeon',
       3: 'Raid',
       6: 'Battleground',
-      9: "Arena",
+      9: 'Arena'
     }
 
     for (const zone of zoneData) {
@@ -175,7 +175,7 @@ class Build {
 
       // Talents are spells and they have a wide range of ids from about 700-46000. Some steps return no data - check for that
       if ($('script[type="text/javascript"]').get().length > 1) {
-        const tableContentRawData = $('script[type="text/javascript"]').get()[1].children[0].data.split('\n');
+        const tableContentRawData = $('script[type="text/javascript"]').get()[1].children[0].data.split('\n')
         // splitIndex is a hack due to an anomaly in the data wowhead returns. Soul shard gets returned as a separate object
         // at index 1 when Shadowburn talent is in the response data
         // If soul shard is detected at index 1, begin at index 2, Soul shard begins with "WH.Gatherer.addData(3"
@@ -712,14 +712,14 @@ class Build {
    * Saves data into a .json file.
    */
   saveJSON (fileName, data) {
-    fs.writeFileSync(path.join(__dirname, "..", "data", fileName), JSON.stringify(data))
+    fs.writeFileSync(path.join(__dirname, '..', 'data', fileName), JSON.stringify(data))
   }
 
   /**
    * Reads data from a .json file
    */
   readJSON (fileName) {
-    return JSON.parse(fs.readFileSync(path.join(__dirname, "..", "data", fileName), 'utf8'))
+    return JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'data', fileName), 'utf8'))
   }
 
   /**
