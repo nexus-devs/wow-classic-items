@@ -1,4 +1,5 @@
 const fs = require('fs')
+const path = require('path')
 const colors = require('colors/safe')
 const assert = require('assert')
 
@@ -6,8 +7,8 @@ const assert = require('assert')
  * Check differences between new and old JSON data
  */
 async function validate (fileOld, fileNew) {
-  const dataOld = JSON.parse(fs.readFileSync(`${__dirname}/../data/${fileOld}`, 'utf8'))
-  const dataNew = JSON.parse(fs.readFileSync(`${__dirname}/../data/${fileNew}`, 'utf8'))
+  const dataOld = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'data', fileOld), 'utf8'))
+  const dataNew = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'data', fileNew), 'utf8'))
 
   let itemsDeleted = 0
   let itemsChanged = 0
@@ -28,7 +29,6 @@ async function validate (fileOld, fileNew) {
   printValidation(itemsAdded, 'items added')
   printValidation(itemsChanged, 'items changed')
 
-  console.log()
   if (itemsDeleted > 0 || itemsAdded > 0 || itemsChanged > 0) {
     console.log(colors.yellow('Changes detected'))
     console.log('Either something went wrong with your build or you improved it somehow (e.g. better sanitization). In the latter case, please make a pull request to get the new data up!')
