@@ -1,1 +1,877 @@
-[{"id":1977,"name":"Zul'Gurub","category":"Raid","level":[60,60],"territory":"Contested"},{"id":1584,"name":"Blackrock Depths","category":"Dungeon","level":[52,60],"territory":"Contested"},{"id":2677,"name":"Blackwing Lair","category":"Raid","level":[60,60],"territory":"Contested"},{"id":796,"name":"Scarlet Monastery","category":"Dungeon","level":[26,45],"territory":"Horde"},{"id":2100,"name":"Maraudon","category":"Dungeon","level":[42,52],"territory":"Contested"},{"id":2557,"name":"Dire Maul","category":"Dungeon","level":[44,54],"territory":"Contested"},{"id":719,"name":"Blackfathom Deeps","category":"Dungeon","level":[22,32],"territory":"Contested"},{"id":209,"name":"Shadowfang Keep","category":"Dungeon","level":[20,60],"territory":"Horde"},{"id":491,"name":"Razorfen Kraul","category":"Dungeon","level":[32,42],"territory":"Horde"},{"id":2717,"name":"Molten Core","category":"Raid","level":[60,60],"territory":"Contested"},{"id":1176,"name":"Zul'Farrak","category":"Dungeon","level":[46,56],"territory":"Contested"},{"id":16,"name":"Azshara","category":"Open World","level":[42,55],"territory":"Contested"},{"id":718,"name":"Wailing Caverns","category":"Dungeon","level":[17,27],"territory":"Horde"},{"id":2017,"name":"Stratholme","category":"Dungeon","level":[48,58],"territory":"Contested"},{"id":1337,"name":"Uldaman","category":"Dungeon","level":[42,52],"territory":"Contested"},{"id":1583,"name":"Blackrock Spire","category":"Dungeon","level":[55,60],"territory":"Contested"},{"id":722,"name":"Razorfen Downs","category":"Dungeon","level":[37,47],"territory":"Horde"},{"id":1581,"name":"The Deadmines","category":"Dungeon","level":[15,25],"territory":"Alliance"},{"id":361,"name":"Felwood","category":"Open World","level":[47,54],"territory":"Contested"},{"id":139,"name":"Eastern Plaguelands","level":[54,59],"territory":"Contested"},{"id":618,"name":"Winterspring","category":"Open World","level":[55,60],"territory":"Contested"},{"id":267,"name":"Hillsbrad Foothills","level":[20,31],"territory":"Contested"},{"id":405,"name":"Desolace","category":"Open World","level":[30,39],"territory":"Contested"},{"id":47,"name":"The Hinterlands","level":[41,49],"territory":"Contested"},{"id":331,"name":"Ashenvale","category":"Open World","level":[19,30],"territory":"Contested"},{"id":45,"name":"Arathi Highlands","level":[30,40],"territory":"Contested"},{"id":15,"name":"Dustwallow Marsh","category":"Open World","level":[36,61],"territory":"Contested"},{"id":33,"name":"Stranglethorn Vale","level":[30,50],"territory":"Contested"},{"id":721,"name":"Gnomeregan","category":"Dungeon","level":[26,36],"territory":"Alliance"},{"id":1477,"name":"The Temple of Atal'Hakkar","category":"Dungeon","level":[50,60],"territory":"Contested"},{"id":357,"name":"Feralas","category":"Open World","level":[41,60],"territory":"Contested"},{"id":28,"name":"Western Plaguelands","level":[46,57],"territory":"Contested"},{"id":4,"name":"Blasted Lands","level":[46,63],"territory":"Contested"},{"id":1377,"name":"Silithus","category":"Open World","level":[55,59],"territory":"Contested"},{"id":3,"name":"Badlands","level":[36,45],"territory":"Contested"},{"id":440,"name":"Tanaris","category":"Open World","level":[40,50],"territory":"Contested"},{"id":2437,"name":"Ragefire Chasm","category":"Dungeon","level":[15,25],"territory":"Horde"},{"id":8,"name":"Swamp of Sorrows","level":[36,43],"territory":"Contested"},{"id":2057,"name":"Scholomance","category":"Dungeon","level":[55,60],"territory":"Contested"},{"id":493,"name":"Moonglade","category":"Open World","level":[15,15],"territory":"Contested"},{"id":46,"name":"Burning Steppes","level":[50,59],"territory":"Contested"},{"id":717,"name":"The Stockade","category":"Dungeon","level":[22,32],"territory":"Alliance"},{"id":490,"name":"Un'Goro Crater","category":"Open World","level":[48,55],"territory":"Contested"},{"id":51,"name":"Searing Gorge","level":[43,56],"territory":"Contested"},{"id":10,"name":"Duskwood","level":[10,30],"territory":"Contested"},{"id":406,"name":"Stonetalon Mountains","category":"Open World","level":[15,25],"territory":"Contested"},{"id":11,"name":"Wetlands","level":[20,30],"territory":"Contested"},{"id":17,"name":"The Barrens","category":"Open World","level":[10,33],"territory":"Horde"},{"id":3456,"name":"Naxxramas","category":"Raid","level":[60,60],"territory":"Contested"},{"id":400,"name":"Thousand Needles","category":"Open World","level":[24,35],"territory":"Contested"},{"id":148,"name":"Darkshore","category":"Open World","level":[11,19],"territory":"Alliance"},{"id":44,"name":"Redridge Mountains","level":[15,25],"territory":"Contested"},{"id":40,"name":"Westfall","level":[9,18],"territory":"Alliance"},{"id":1519,"name":"Stormwind City","level":[1,60],"territory":"Alliance"},{"id":130,"name":"Silverpine Forest","level":[10,20],"territory":"Horde"},{"id":36,"name":"Alterac Mountains","level":[27,39],"territory":"Contested"},{"id":3428,"name":"Ahn'Qiraj","category":"Raid","level":[60,60],"territory":"Contested"},{"id":1637,"name":"Orgrimmar","category":"Open World","level":[1,60],"territory":"Horde"},{"id":2159,"name":"Onyxia's Lair","category":"Open World","level":[null,null],"territory":"Contested"},{"id":38,"name":"Loch Modan","level":[10,18],"territory":"Alliance"},{"id":2597,"name":"Alterac Valley","category":"Battleground","level":[51,60],"territory":"PvP"},{"id":41,"name":"Deadwind Pass","level":[50,60],"territory":"Contested"},{"id":12,"name":"Elwynn Forest","level":[1,10],"territory":"Alliance"},{"id":85,"name":"Tirisfal Glades","level":[1,12],"territory":"Horde"},{"id":1657,"name":"Darnassus","category":"Open World","level":[1,60],"territory":"Alliance"},{"id":1537,"name":"Ironforge","level":[1,60],"territory":"Alliance"},{"id":1,"name":"Dun Morogh","level":[1,12],"territory":"Alliance"},{"id":1497,"name":"Undercity","level":[1,60],"territory":"Horde"},{"id":3429,"name":"Ruins of Ahn'Qiraj","category":"Raid","level":[60,60],"territory":"Contested"},{"id":1638,"name":"Thunder Bluff","category":"Open World","level":[1,60],"territory":"Horde"},{"id":3358,"name":"Arathi Basin","category":"Battleground","level":[20,60],"territory":"PvP"},{"id":14,"name":"Durotar","category":"Open World","level":[1,10],"territory":"Horde"},{"id":141,"name":"Teldrassil","category":"Open World","level":[1,11],"territory":"Alliance"},{"id":1417,"name":"Sunken Temple","category":"Dungeon","level":[50,60],"territory":"Contested"},{"id":215,"name":"Mulgore","category":"Open World","level":[1,10],"territory":"Horde"},{"id":3277,"name":"Warsong Gulch","category":"Battleground","level":[10,60],"territory":"PvP"},{"id":25,"name":"Blackrock Mountain","level":[null,null],"territory":"Contested"},{"id":2257,"name":"Deeprun Tram","level":[null,null],"territory":"Alliance"},{"id":457,"name":"The Veiled Sea","category":"Open World","level":[null,null],"territory":"Contested"},{"id":1941,"name":"Caverns of Time","category":"Open World","level":[null,null],"territory":"Contested"},{"id":207,"name":"The Great Sea","category":"Dungeon","level":[null,null],"territory":"Contested"},{"id":1397,"name":"Emerald Forest","category":"Raid","level":[null,null],"territory":"Contested"}]
+[
+  {
+    "id": 3562,
+    "name": "Hellfire Ramparts",
+    "category": "Dungeon",
+    "level": [59, 67],
+    "territory": "Contested"
+  },
+  {
+    "id": 3717,
+    "name": "The Slave Pens",
+    "category": "Dungeon",
+    "level": [61, 69],
+    "territory": "Contested"
+  },
+  {
+    "id": 3713,
+    "name": "The Blood Furnace",
+    "category": "Dungeon",
+    "level": [60, 68],
+    "territory": "Contested"
+  },
+  {
+    "id": 3483,
+    "name": "Hellfire Peninsula",
+    "level": [58, 70],
+    "territory": "Contested"
+  },
+  {
+    "id": 3716,
+    "name": "The Underbog",
+    "category": "Dungeon",
+    "level": [62, 70],
+    "territory": "Contested"
+  },
+  {
+    "id": 3792,
+    "name": "Mana-Tombs",
+    "category": "Dungeon",
+    "level": [63, 70],
+    "territory": "Contested"
+  },
+  {
+    "id": 3521,
+    "name": "Zangarmarsh",
+    "level": [60, 63],
+    "territory": "Contested"
+  },
+  {
+    "id": 3703,
+    "name": "Shattrath City",
+    "level": [1, 70],
+    "territory": "Sanctuary"
+  },
+  {
+    "id": 3791,
+    "name": "Sethekk Halls",
+    "category": "Dungeon",
+    "level": [66, 70],
+    "territory": "Contested"
+  },
+  {
+    "id": 3714,
+    "name": "The Shattered Halls",
+    "category": "Dungeon",
+    "level": [69, 70],
+    "territory": "Contested"
+  },
+  {
+    "id": 3790,
+    "name": "Auchenai Crypts",
+    "category": "Dungeon",
+    "level": [64, 70],
+    "territory": "Contested"
+  },
+  {
+    "id": 3519,
+    "name": "Terokkar Forest",
+    "level": [62, 70],
+    "territory": "Contested"
+  },
+  {
+    "id": 3457,
+    "name": "Karazhan",
+    "category": "Raid",
+    "level": [null, null],
+    "territory": "Contested"
+  },
+  {
+    "id": 3715,
+    "name": "The Steamvault",
+    "category": "Dungeon",
+    "level": [69, 70],
+    "territory": "Contested"
+  },
+  {
+    "id": 3518,
+    "name": "Nagrand",
+    "level": [64, 70],
+    "territory": "Contested"
+  },
+  {
+    "id": 3789,
+    "name": "Shadow Labyrinth",
+    "category": "Dungeon",
+    "level": [69, 70],
+    "territory": "Contested"
+  },
+  {
+    "id": 2366,
+    "name": "The Black Morass",
+    "category": "Dungeon",
+    "level": [68, 70],
+    "territory": "Contested"
+  },
+  {
+    "id": 2367,
+    "name": "Old Hillsbrad Foothills",
+    "category": "Dungeon",
+    "level": [66, 70],
+    "territory": "Contested"
+  },
+  {
+    "id": 3923,
+    "name": "Gruul's Lair",
+    "category": "Raid",
+    "level": [null, null],
+    "territory": "Contested"
+  },
+  {
+    "id": 3520,
+    "name": "Shadowmoon Valley",
+    "level": [67, 70],
+    "territory": "Contested"
+  },
+  {
+    "id": 3836,
+    "name": "Magtheridon's Lair",
+    "category": "Raid",
+    "level": [null, null],
+    "territory": "Contested"
+  },
+  {
+    "id": 3522,
+    "name": "Blade's Edge Mountains",
+    "level": [65, 70],
+    "territory": "Contested"
+  },
+  {
+    "id": 3849,
+    "name": "The Mechanar",
+    "category": "Dungeon",
+    "level": [68, 70],
+    "territory": "Contested"
+  },
+  {
+    "id": 796,
+    "name": "Scarlet Monastery",
+    "category": "Dungeon",
+    "level": [26, 45],
+    "territory": "Horde"
+  },
+  {
+    "id": 3848,
+    "name": "The Arcatraz",
+    "category": "Dungeon",
+    "level": [69, 70],
+    "territory": "Contested"
+  },
+  {
+    "id": 3847,
+    "name": "The Botanica",
+    "category": "Dungeon",
+    "level": [69, 70],
+    "territory": "Contested"
+  },
+  {
+    "id": 3523,
+    "name": "Netherstorm",
+    "level": [66, 70],
+    "territory": "Contested"
+  },
+  {
+    "id": 1176,
+    "name": "Zul'Farrak",
+    "category": "Dungeon",
+    "level": [46, 56],
+    "territory": "Contested"
+  },
+  {
+    "id": 1477,
+    "name": "The Temple of Atal'Hakkar",
+    "category": "Dungeon",
+    "level": [50, 60],
+    "territory": "Contested"
+  },
+  {
+    "id": 491,
+    "name": "Razorfen Kraul",
+    "category": "Dungeon",
+    "level": [32, 42],
+    "territory": "Horde"
+  },
+  {
+    "id": 719,
+    "name": "Blackfathom Deeps",
+    "category": "Dungeon",
+    "level": [22, 32],
+    "territory": "Contested"
+  },
+  {
+    "id": 209,
+    "name": "Shadowfang Keep",
+    "category": "Dungeon",
+    "level": [20, 60],
+    "territory": "Horde"
+  },
+  {
+    "id": 4,
+    "name": "Blasted Lands",
+    "level": [46, 63],
+    "territory": "Contested"
+  },
+  {
+    "id": 1337,
+    "name": "Uldaman",
+    "category": "Dungeon",
+    "level": [42, 52],
+    "territory": "Contested"
+  },
+  {
+    "id": 722,
+    "name": "Razorfen Downs",
+    "category": "Dungeon",
+    "level": [37, 47],
+    "territory": "Horde"
+  },
+  {
+    "id": 3959,
+    "name": "Black Temple",
+    "category": "Raid",
+    "level": [null, null],
+    "territory": "Contested"
+  },
+  {
+    "id": 2100,
+    "name": "Maraudon",
+    "category": "Dungeon",
+    "level": [42, 52],
+    "territory": "Contested"
+  },
+  {
+    "id": 4075,
+    "name": "Sunwell Plateau",
+    "category": "Raid",
+    "level": [70, 70],
+    "territory": "Contested"
+  },
+  {
+    "id": 718,
+    "name": "Wailing Caverns",
+    "category": "Dungeon",
+    "level": [17, 27],
+    "territory": "Horde"
+  },
+  {
+    "id": 2017,
+    "name": "Stratholme",
+    "category": "Dungeon",
+    "level": [48, 58],
+    "territory": "Contested"
+  },
+  {
+    "id": 3607,
+    "name": "Serpentshrine Cavern",
+    "category": "Raid",
+    "level": [null, null],
+    "territory": "Contested"
+  },
+  {
+    "id": 3535,
+    "name": "Hellfire Citadel",
+    "category": "Dungeon",
+    "level": [null, null],
+    "territory": "Contested"
+  },
+  {
+    "id": 1584,
+    "name": "Blackrock Depths",
+    "category": "Dungeon",
+    "level": [52, 60],
+    "territory": "Contested"
+  },
+  {
+    "id": 3524,
+    "name": "Azuremyst Isle",
+    "level": [1, 10],
+    "territory": "Alliance"
+  },
+  {
+    "id": 721,
+    "name": "Gnomeregan",
+    "category": "Dungeon",
+    "level": [26, 36],
+    "territory": "Alliance"
+  },
+  {
+    "id": 3430,
+    "name": "Eversong Woods",
+    "level": [1, 10],
+    "territory": "Horde"
+  },
+  {
+    "id": 3525,
+    "name": "Bloodmyst Isle",
+    "level": [9, 19],
+    "territory": "Alliance"
+  },
+  {
+    "id": 139,
+    "name": "Eastern Plaguelands",
+    "level": [54, 59],
+    "territory": "Contested"
+  },
+  {
+    "id": 3487,
+    "name": "Silvermoon City",
+    "level": [1, 70],
+    "territory": "Horde"
+  },
+  {
+    "id": 2437,
+    "name": "Ragefire Chasm",
+    "category": "Dungeon",
+    "level": [15, 25],
+    "territory": "Horde"
+  },
+  {
+    "id": 2057,
+    "name": "Scholomance",
+    "category": "Dungeon",
+    "level": [55, 60],
+    "territory": "Contested"
+  },
+  {
+    "id": 618,
+    "name": "Winterspring",
+    "category": "Open World",
+    "level": [55, 60],
+    "territory": "Contested"
+  },
+  {
+    "id": 1581,
+    "name": "The Deadmines",
+    "category": "Dungeon",
+    "level": [15, 25],
+    "territory": "Alliance"
+  },
+  { "id": 3433, "name": "Ghostlands", "level": [10, 20], "territory": "Horde" },
+  {
+    "id": 15,
+    "name": "Dustwallow Marsh",
+    "category": "Open World",
+    "level": [35, 61],
+    "territory": "Contested"
+  },
+  {
+    "id": 4131,
+    "name": "Magisters' Terrace",
+    "category": "Dungeon",
+    "level": [69, 70],
+    "territory": "Contested"
+  },
+  {
+    "id": 47,
+    "name": "The Hinterlands",
+    "level": [41, 49],
+    "territory": "Contested"
+  },
+  {
+    "id": 33,
+    "name": "Stranglethorn Vale",
+    "level": [30, 50],
+    "territory": "Contested"
+  },
+  {
+    "id": 3845,
+    "name": "Tempest Keep",
+    "category": "Raid",
+    "level": [null, null],
+    "territory": "Contested"
+  },
+  {
+    "id": 361,
+    "name": "Felwood",
+    "category": "Open World",
+    "level": [47, 54],
+    "territory": "Contested"
+  },
+  {
+    "id": 1377,
+    "name": "Silithus",
+    "category": "Open World",
+    "level": [55, 59],
+    "territory": "Contested"
+  },
+  {
+    "id": 331,
+    "name": "Ashenvale",
+    "category": "Open World",
+    "level": [19, 30],
+    "territory": "Contested"
+  },
+  {
+    "id": 2557,
+    "name": "Dire Maul",
+    "category": "Dungeon",
+    "level": [44, 54],
+    "territory": "Contested"
+  },
+  {
+    "id": 28,
+    "name": "Western Plaguelands",
+    "level": [46, 57],
+    "territory": "Contested"
+  },
+  {
+    "id": 440,
+    "name": "Tanaris",
+    "category": "Open World",
+    "level": [40, 50],
+    "territory": "Contested"
+  },
+  {
+    "id": 8,
+    "name": "Swamp of Sorrows",
+    "level": [36, 43],
+    "territory": "Contested"
+  },
+  {
+    "id": 490,
+    "name": "Un'Goro Crater",
+    "category": "Open World",
+    "level": [48, 55],
+    "territory": "Contested"
+  },
+  {
+    "id": 717,
+    "name": "The Stockade",
+    "category": "Dungeon",
+    "level": [22, 32],
+    "territory": "Alliance"
+  },
+  {
+    "id": 3606,
+    "name": "Hyjal Summit",
+    "category": "Raid",
+    "level": [null, null],
+    "territory": "Contested"
+  },
+  {
+    "id": 3557,
+    "name": "The Exodar",
+    "level": [1, 70],
+    "territory": "Alliance"
+  },
+  {
+    "id": 1583,
+    "name": "Blackrock Spire",
+    "category": "Dungeon",
+    "level": [55, 60],
+    "territory": "Contested"
+  },
+  {
+    "id": 45,
+    "name": "Arathi Highlands",
+    "level": [30, 40],
+    "territory": "Contested"
+  },
+  {
+    "id": 3456,
+    "name": "Naxxramas",
+    "category": "Raid",
+    "level": [60, 60],
+    "territory": "Contested"
+  },
+  {
+    "id": 357,
+    "name": "Feralas",
+    "category": "Open World",
+    "level": [41, 60],
+    "territory": "Contested"
+  },
+  { "id": 3, "name": "Badlands", "level": [36, 45], "territory": "Contested" },
+  {
+    "id": 46,
+    "name": "Burning Steppes",
+    "level": [50, 59],
+    "territory": "Contested"
+  },
+  {
+    "id": 1977,
+    "name": "Zul'Gurub",
+    "category": "Raid",
+    "level": [60, 60],
+    "territory": "Contested"
+  },
+  {
+    "id": 41,
+    "name": "Deadwind Pass",
+    "level": [50, 60],
+    "territory": "Contested"
+  },
+  {
+    "id": 267,
+    "name": "Hillsbrad Foothills",
+    "level": [20, 31],
+    "territory": "Contested"
+  },
+  {
+    "id": 51,
+    "name": "Searing Gorge",
+    "level": [43, 56],
+    "territory": "Contested"
+  },
+  {
+    "id": 3698,
+    "name": "Nagrand Arena (Nagrand Arena)",
+    "category": "Arena",
+    "level": [1, 1],
+    "territory": "PvP"
+  },
+  {
+    "id": 405,
+    "name": "Desolace",
+    "category": "Open World",
+    "level": [30, 39],
+    "territory": "Contested"
+  },
+  {
+    "id": 16,
+    "name": "Azshara",
+    "category": "Open World",
+    "level": [42, 55],
+    "territory": "Contested"
+  },
+  {
+    "id": 493,
+    "name": "Moonglade",
+    "category": "Open World",
+    "level": [15, 15],
+    "territory": "Contested"
+  },
+  {
+    "id": 406,
+    "name": "Stonetalon Mountains",
+    "category": "Open World",
+    "level": [15, 25],
+    "territory": "Contested"
+  },
+  {
+    "id": 400,
+    "name": "Thousand Needles",
+    "category": "Open World",
+    "level": [24, 35],
+    "territory": "Contested"
+  },
+  {
+    "id": 17,
+    "name": "The Barrens",
+    "category": "Open World",
+    "level": [10, 33],
+    "territory": "Horde"
+  },
+  { "id": 11, "name": "Wetlands", "level": [20, 30], "territory": "Contested" },
+  {
+    "id": 1519,
+    "name": "Stormwind City",
+    "level": [1, 70],
+    "territory": "Alliance"
+  },
+  {
+    "id": 1637,
+    "name": "Orgrimmar",
+    "category": "Open World",
+    "level": [1, 70],
+    "territory": "Horde"
+  },
+  { "id": 10, "name": "Duskwood", "level": [10, 30], "territory": "Contested" },
+  {
+    "id": 3805,
+    "name": "Zul'Aman",
+    "category": "Raid",
+    "level": [null, null],
+    "territory": "Contested"
+  },
+  {
+    "id": 3917,
+    "name": "Auchindoun",
+    "level": [null, null],
+    "territory": "Contested"
+  },
+  {
+    "id": 3820,
+    "name": "Eye of the Storm",
+    "category": "Battleground",
+    "level": [1, 1],
+    "territory": "PvP"
+  },
+  {
+    "id": 44,
+    "name": "Redridge Mountains",
+    "level": [15, 25],
+    "territory": "Contested"
+  },
+  {
+    "id": 2597,
+    "name": "Alterac Valley",
+    "category": "Battleground",
+    "level": [51, 70],
+    "territory": "PvP"
+  },
+  {
+    "id": 3429,
+    "name": "Ruins of Ahn'Qiraj",
+    "category": "Raid",
+    "level": [60, 60],
+    "territory": "Contested"
+  },
+  {
+    "id": 2677,
+    "name": "Blackwing Lair",
+    "category": "Raid",
+    "level": [60, 60],
+    "territory": "Contested"
+  },
+  {
+    "id": 36,
+    "name": "Alterac Mountains",
+    "level": [27, 39],
+    "territory": "Contested"
+  },
+  {
+    "id": 4080,
+    "name": "Isle of Quel'Danas",
+    "level": [70, 70],
+    "territory": "Contested"
+  },
+  {
+    "id": 130,
+    "name": "Silverpine Forest",
+    "level": [10, 20],
+    "territory": "Horde"
+  },
+  {
+    "id": 1638,
+    "name": "Thunder Bluff",
+    "category": "Open World",
+    "level": [1, 70],
+    "territory": "Horde"
+  },
+  {
+    "id": 12,
+    "name": "Elwynn Forest",
+    "level": [1, 10],
+    "territory": "Alliance"
+  },
+  { "id": 40, "name": "Westfall", "level": [9, 18], "territory": "Alliance" },
+  {
+    "id": 1941,
+    "name": "Caverns of Time",
+    "category": "Open World",
+    "level": [null, null],
+    "territory": "Contested"
+  },
+  {
+    "id": 3428,
+    "name": "Ahn'Qiraj",
+    "category": "Raid",
+    "level": [60, 60],
+    "territory": "Contested"
+  },
+  {
+    "id": 85,
+    "name": "Tirisfal Glades",
+    "level": [1, 12],
+    "territory": "Horde"
+  },
+  {
+    "id": 148,
+    "name": "Darkshore",
+    "category": "Open World",
+    "level": [11, 19],
+    "territory": "Alliance"
+  },
+  { "id": 1497, "name": "Undercity", "level": [1, 70], "territory": "Horde" },
+  {
+    "id": 2717,
+    "name": "Molten Core",
+    "category": "Raid",
+    "level": [60, 60],
+    "territory": "Contested"
+  },
+  {
+    "id": 14,
+    "name": "Durotar",
+    "category": "Open World",
+    "level": [1, 10],
+    "territory": "Horde"
+  },
+  {
+    "id": 38,
+    "name": "Loch Modan",
+    "level": [10, 18],
+    "territory": "Alliance"
+  },
+  { "id": 1, "name": "Dun Morogh", "level": [1, 12], "territory": "Alliance" },
+  {
+    "id": 3277,
+    "name": "Warsong Gulch",
+    "category": "Battleground",
+    "level": [10, 70],
+    "territory": "PvP"
+  },
+  {
+    "id": 1537,
+    "name": "Ironforge",
+    "level": [1, 70],
+    "territory": "Alliance"
+  },
+  {
+    "id": 215,
+    "name": "Mulgore",
+    "category": "Open World",
+    "level": [1, 10],
+    "territory": "Horde"
+  },
+  {
+    "id": 3358,
+    "name": "Arathi Basin",
+    "category": "Battleground",
+    "level": [20, 70],
+    "territory": "PvP"
+  },
+  {
+    "id": 1657,
+    "name": "Darnassus",
+    "category": "Open World",
+    "level": [1, 70],
+    "territory": "Alliance"
+  },
+  {
+    "id": 141,
+    "name": "Teldrassil",
+    "category": "Open World",
+    "level": [1, 11],
+    "territory": "Alliance"
+  },
+  {
+    "id": 2159,
+    "name": "Onyxia's Lair",
+    "category": "Open World",
+    "level": [null, null],
+    "territory": "Contested"
+  },
+  {
+    "id": 25,
+    "name": "Blackrock Mountain",
+    "level": [null, null],
+    "territory": "Contested"
+  },
+  {
+    "id": 3537,
+    "name": "REUSE",
+    "level": [null, null],
+    "territory": "Contested"
+  },
+  {
+    "id": 3702,
+    "name": "Blade's Edge Arena (Blade's Edge Arena)",
+    "category": "Arena",
+    "level": [1, 1],
+    "territory": "PvP"
+  },
+  {
+    "id": 3605,
+    "name": "Hyjal Past",
+    "category": "Dungeon",
+    "level": [null, null],
+    "territory": "Contested"
+  },
+  {
+    "id": 3455,
+    "name": "The North Sea",
+    "level": [null, null],
+    "territory": "Horde"
+  },
+  {
+    "id": 3711,
+    "name": "Reuse Me",
+    "level": [null, null],
+    "territory": "Contested"
+  },
+  {
+    "id": 4076,
+    "name": "Reuse Me 7",
+    "category": "Dungeon",
+    "level": [null, null],
+    "territory": "Contested"
+  },
+  {
+    "id": 3817,
+    "name": "Test Dungeon",
+    "category": "Dungeon",
+    "level": [null, null],
+    "territory": "Contested"
+  },
+  {
+    "id": 2257,
+    "name": "Deeprun Tram",
+    "level": [null, null],
+    "territory": "Alliance"
+  },
+  {
+    "id": 3968,
+    "name": "Ruins of Lordaeron (Undercity Arena)",
+    "category": "Arena",
+    "level": [1, 1],
+    "territory": "PvP"
+  },
+  {
+    "id": 457,
+    "name": "The Veiled Sea",
+    "category": "Open World",
+    "level": [null, null],
+    "territory": "Contested"
+  },
+  {
+    "id": 1397,
+    "name": "Emerald Forest",
+    "category": "Raid",
+    "level": [null, null],
+    "territory": "Contested"
+  },
+  {
+    "id": 207,
+    "name": "The Great Sea",
+    "level": [null, null],
+    "territory": "Contested"
+  },
+  {
+    "id": 3948,
+    "name": "Brian and Pat Test",
+    "level": [null, null],
+    "territory": "Contested"
+  },
+  {
+    "id": 3540,
+    "name": "Twisting Nether",
+    "level": [null, null],
+    "territory": "Contested"
+  },
+  {
+    "id": 3477,
+    "name": "Karazhan *UNUSED*",
+    "category": "Raid",
+    "level": [null, null],
+    "territory": "Contested"
+  },
+  {
+    "id": 1417,
+    "name": "Sunken Temple",
+    "category": "Dungeon",
+    "level": [50, 60],
+    "territory": "Contested"
+  }
+]
