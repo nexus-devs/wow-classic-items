@@ -44,7 +44,6 @@ class Build {
       for (const stage of this.pipeline[pipeline]) {
         stageResult = await stage.fn(stageResult)
       }
-
       this.saveJSON(`build/${pipeline}.json`, stageResult)
     }
   }

@@ -115,7 +115,7 @@ Install Dependencies:
 npm install
 ```
 
-Add your Blizzard API Access token to a file called `blizzard_token` in the root directory
+Create a file called `blizzard_token` in the root directory and add your Blizzard API Access token
 
 Create directory `data/build`
 ```
