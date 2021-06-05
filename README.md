@@ -109,14 +109,28 @@ Note that the actual sell price is not included in the tooltip (just the label),
 <br>
 
 ### Building and Testing
-The professions database is currently handmade.  
+
+Install Dependencies:
+```
+npm install
+```
+
+Create a file called `blizzard_token` in the root directory and add your Blizzard API Access token
+
+Create directory `data/build`
+```
+mkdir data/build
+```
+
 Build the item database (default output is `/data/build/data.json`):
 ```
 npm run build
 ```
-After that you can verify the build and/or check the changes between yours and the current one with:
+The professions database is currently handmade.
+
+After that you can validate the build and/or check the changes between yours and the current one with:
 ```
-npm run verify
+npm run validate
 ```
 Test the item class with:
 ```

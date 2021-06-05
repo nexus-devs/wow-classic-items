@@ -2,11 +2,15 @@ const request = require('requestretry')
 const cheerio = require('cheerio')
 const ProgressBar = require('./progress')
 const fs = require('fs')
+const path = require('path')
 const colors = require('colors/safe')
 
 class Build {
   constructor (blizzardToken = 'blizzard_token') {
     this.pipeline = {}
+
+    // Zones pipeline
+    this.pipeline.zones = [{ name: 'zones', fn: this.scrapeWowheadZones }]
 
     // Item pipeline
     this.pipeline.items = [
@@ -23,7 +27,7 @@ class Build {
     ]
 
     try {
-      this.blizzardToken = fs.readFileSync(`${__dirname}/../${blizzardToken}`, 'utf8').trim()
+      this.blizzardToken = fs.readFileSync(path.join(__dirname, '..', blizzardToken), 'utf8').trim()
     } catch (err) {
       if (err.code !== 'ENOENT') throw err // Don't throw error if file simply doesn't exist
       else this.warn('Blizzard Token could not be found')
@@ -34,10 +38,6 @@ class Build {
    * Starts the build process.
    */
   async start () {
-    // Run zones
-    const zones = this.scrapeWowheadZones()
-    this.saveJSON('build/zones.json', zones)
-
     // Run all pipelines
     for (const pipeline of Object.keys(this.pipeline)) {
       let stageResult
@@ -69,28 +69,33 @@ class Build {
   async scrapeWowheadListing () {
     const items = []
 
-    // Filter the items by ID (total ID range about 24000).
+    // Filter the items by ID (total ID range about 40000).
     const stepSize = 500 // Wowhead can only show about 500 items per page.
-    const progress = new ProgressBar('Fetching base items', 24500 / stepSize)
-    for (let i = 0; i < 24500; i += stepSize) {
+    const progress = new ProgressBar('Fetching base items', 40000 / stepSize)
+    for (let i = 0; i < 40000; i += stepSize) {
       const req = await request({
-        url: `https://classic.wowhead.com/items?filter=162:151:151;2:2:5;0:${i}:${i + stepSize}`,
+        url: `https://tbc.wowhead.com/items?filter=162:151:151;2:2:5;0:${i}:${i + stepSize}`,
         json: true
       })
 
       // Wowhead uses JavaScript to load in their table content, so we'd need something like Selenium to get the HTML.
       // However, that is really painful and slow. Fortunately, with some parsing the table content is available in the source code.
       const $ = cheerio.load(req.body)
-      const tableContentRaw = $('script[type="text/javascript"]').get()[1].children[0].data.split('\n')[1].slice(26, -2)
-      const tableContent = JSON.parse(tableContentRaw)
 
-      for (const key of Object.keys(tableContent)) {
-        const item = tableContent[key]
-        items.push({
-          itemId: parseInt(key),
-          name: item.name_enus,
-          icon: item.icon
-        })
+      const scripts = $('script[type="text/javascript"]').get() // The range 36000-36500 has no data and cause a TypeError, pull scripts out so that we can check whether data exists.
+
+      if (scripts[1]) {
+        const tableContentRaw = scripts[1].children[0].data.split('\n')[1].slice(26, -2)
+        const tableContent = JSON.parse(tableContentRaw)
+
+        for (const key of Object.keys(tableContent)) {
+          const item = tableContent[key]
+          items.push({
+            itemId: parseInt(key),
+            name: item.name_enus,
+            icon: item.icon
+          })
+        }
       }
 
       progress.tick()
@@ -105,9 +110,9 @@ class Build {
   async scrapeWowheadZones () {
     const zones = []
 
-    const progress = new ProgressBar('Fetching zones', 82)
+    const progress = new ProgressBar('Fetching zones', 137)
     const req = await request({
-      url: 'https://classic.wowhead.com/zones',
+      url: 'https://tbc.wowhead.com/zones',
       json: true
     })
 
@@ -122,13 +127,15 @@ class Build {
       0: 'Alliance',
       1: 'Horde',
       2: 'Contested',
+      3: 'Sanctuary',
       4: 'PvP'
     }
     const category = {
       1: 'Open World',
       2: 'Dungeon',
       3: 'Raid',
-      6: 'Battleground'
+      6: 'Battleground',
+      9: 'Arena'
     }
 
     for (const zone of zoneData) {
@@ -152,13 +159,13 @@ class Build {
   async scrapeWowheadTalents () {
     const talents = []
 
-    // Filter the talents by ID (total ID range for talents spells is about 31000).
+    // Filter the talents by ID (total ID range for talents spells is about 46000).
     const stepSize = 1000 // Wowhead can show about 1000 talents per page.
-    const progress = new ProgressBar('Fetching talents', 31000 / stepSize)
+    const progress = new ProgressBar('Fetching talents', 46000 / stepSize)
 
-    for (let i = 0; i < 31000; i += stepSize) {
+    for (let i = 0; i < 46000; i += stepSize) {
       const req = await request({
-        url: `https://classic.wowhead.com/talents?filter=14:14;2:5;${i}:${i + stepSize}`,
+        url: `https://tbc.wowhead.com/talents?filter=14:14;2:5;${i}:${i + stepSize}`,
         json: true
       })
 
@@ -166,9 +173,9 @@ class Build {
       // However, that is really painful and slow. Fortunately, with some parsing the table content is available in the source code.
       const $ = cheerio.load(req.body)
 
-      // Talents are spells and they have a wide range of ids from about 700-31000. Some steps return no data - check for that
+      // Talents are spells and they have a wide range of ids from about 700-46000. Some steps return no data - check for that
       if ($('script[type="text/javascript"]').get().length > 1) {
-        const tableContentRawData = $('script[type="text/javascript"]').get()[1].children[0].data.split('\n');
+        const tableContentRawData = $('script[type="text/javascript"]').get()[1].children[0].data.split('\n')
         // splitIndex is a hack due to an anomaly in the data wowhead returns. Soul shard gets returned as a separate object
         // at index 1 when Shadowburn talent is in the response data
         // If soul shard is detected at index 1, begin at index 2, Soul shard begins with "WH.Gatherer.addData(3"
@@ -197,7 +204,7 @@ class Build {
   async scrapeWowheadTalentsDetail (input) {
     const applyCraftingInfo = async (talent) => {
       const req = await request({
-        url: `https://classic.wowhead.com/spell=${talent.id}`,
+        url: `https://tbc.wowhead.com/spell=${talent.id}`,
         json: true
       })
 
@@ -241,7 +248,7 @@ class Build {
     // Fetch function so we can parallelize it
     const fetchItem = async (item) => {
       const req = await request({
-        url: `https://us.api.blizzard.com/data/wow/item/${item.itemId}?namespace=static-classic-us&locale=en_US&access_token=${this.blizzardToken}`,
+        url: `https://us.api.blizzard.com/data/wow/item/${item.itemId}?namespace=static-2.5.1_38644-classic-us&locale=en_US&access_token=${this.blizzardToken}`,
         json: true
       })
 
@@ -290,7 +297,7 @@ class Build {
   async scrapeWowheadDetail (input) {
     const applyCraftingInfo = async (item) => {
       const req = await request({
-        url: `https://classic.wowhead.com/item=${item.itemId}`,
+        url: `https://tbc.wowhead.com/item=${item.itemId}`,
         json: true
       })
 
@@ -306,7 +313,7 @@ class Build {
     }
 
     let parallel = []
-    const batchSize = 200
+    const batchSize = 50 // If the build silently fails at 'Fetching item details', consider lowering this
     const progress = new ProgressBar('Fetching item details', (input.length / batchSize) + 1)
     for (let i = 0; i < input.length; i++) {
       const item = input[i]
@@ -361,7 +368,8 @@ class Build {
       171: 'Alchemy',
       165: 'Leatherworking',
       164: 'Blacksmithing',
-      129: 'First Aid'
+      129: 'First Aid',
+      755: 'Jewelcrafting'
     }
 
     const $ = cheerio.load(req.body)
@@ -410,7 +418,7 @@ class Build {
     const recipes = []
 
     const req = await request({
-      url: `https://classic.wowhead.com/spell=${spellId}`,
+      url: `https://tbc.wowhead.com/spell=${spellId}`,
       json: true
     })
 
@@ -493,6 +501,9 @@ class Build {
       // Add color formatting
       if (classes && qualities[classes[0]]) newLabelObj.format = qualities[classes[0]] // Add color format
       else if (parentClasses && qualities[parentClasses[0]]) newLabelObj.format = qualities[parentClasses[0]] // Add color format from parent
+
+      // Sockets
+      if (/^[a-zA-Z]+ Socket$/g.test(newLabelObj.label)) newLabelObj.format = qualities.q0
 
       // Add alignment formatting
       if (tag && tag.name === 'th') newLabelObj.format = 'alignRight'
@@ -596,7 +607,7 @@ class Build {
             for (const drop of data) {
               if (!drop.location) continue
               locations = locations.concat(drop.location)
-              chanceAcc += (drop.count / drop.outof) * drop.location.length
+              chanceAcc += (drop.percentOverride ? drop.percentOverride / 100 : (drop.count / drop.outof)) * drop.location.length
               name = drop.name
             }
 
@@ -704,14 +715,14 @@ class Build {
    * Saves data into a .json file.
    */
   saveJSON (fileName, data) {
-    fs.writeFileSync(`${__dirname}/../data/${fileName}`, JSON.stringify(data))
+    fs.writeFileSync(path.join(__dirname, '..', 'data', fileName), JSON.stringify(data))
   }
 
   /**
    * Reads data from a .json file
    */
   readJSON (fileName) {
-    return JSON.parse(fs.readFileSync(`${__dirname}/../data/${fileName}`, 'utf8'))
+    return JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'data', fileName), 'utf8'))
   }
 
   /**
