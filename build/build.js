@@ -502,6 +502,9 @@ class Build {
       if (classes && qualities[classes[0]]) newLabelObj.format = qualities[classes[0]] // Add color format
       else if (parentClasses && qualities[parentClasses[0]]) newLabelObj.format = qualities[parentClasses[0]] // Add color format from parent
 
+      // Sockets
+      if (/^[a-zA-Z]+ Socket$/g.test(newLabelObj.label)) newLabelObj.format = qualities.q0
+
       // Add alignment formatting
       if (tag && tag.name === 'th') newLabelObj.format = 'alignRight'
       if (tag) {
