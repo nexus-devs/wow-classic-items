@@ -32,6 +32,8 @@ class Build {
       if (err.code !== 'ENOENT') throw err // Don't throw error if file simply doesn't exist
       else this.warn('Blizzard Token could not be found')
     }
+
+    this.wowheadURL = 'https://wowhead.com/wotlk'
   }
 
   /**
@@ -74,7 +76,7 @@ class Build {
     const progress = new ProgressBar('Fetching base items', 40000 / stepSize)
     for (let i = 0; i < 40000; i += stepSize) {
       const req = await request({
-        url: `https://tbc.wowhead.com/items?filter=162:151:151;2:2:5;0:${i}:${i + stepSize}`,
+        url: `${this.wowheadURL}/items?filter=162:151:151;2:2:5;0:${i}:${i + stepSize}`,
         json: true
       })
 
@@ -112,7 +114,7 @@ class Build {
 
     const progress = new ProgressBar('Fetching zones', 137)
     const req = await request({
-      url: 'https://tbc.wowhead.com/zones',
+      url: `${this.wowheadURL}/zones`,
       json: true
     })
 
@@ -165,7 +167,7 @@ class Build {
 
     for (let i = 0; i < 46000; i += stepSize) {
       const req = await request({
-        url: `https://tbc.wowhead.com/talents?filter=14:14;2:5;${i}:${i + stepSize}`,
+        url: `${this.wowheadURL}/talents?filter=14:14;2:5;${i}:${i + stepSize}`,
         json: true
       })
 
@@ -204,7 +206,7 @@ class Build {
   async scrapeWowheadTalentsDetail (input) {
     const applyCraftingInfo = async (talent) => {
       const req = await request({
-        url: `https://tbc.wowhead.com/spell=${talent.id}`,
+        url: `${this.wowheadURL}/spell=${talent.id}`,
         json: true
       })
 
@@ -297,7 +299,7 @@ class Build {
   async scrapeWowheadDetail (input) {
     const applyCraftingInfo = async (item) => {
       const req = await request({
-        url: `https://tbc.wowhead.com/item=${item.itemId}`,
+        url: `${this.wowheadURL}/item=${item.itemId}`,
         json: true
       })
 
@@ -419,7 +421,7 @@ class Build {
     const recipes = []
 
     const req = await request({
-      url: `https://tbc.wowhead.com/spell=${spellId}`,
+      url: `${this.wowheadURL}/spell=${spellId}`,
       json: true
     })
 
