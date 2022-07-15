@@ -121,7 +121,7 @@ class Build {
     // Wowhead uses JavaScript to load in their table content, so we'd need something like Selenium to get the HTML.
     // However, that is really painful and slow. Fortunately, with some parsing the table content is available in the source code.
     const $ = cheerio.load(req.body)
-    const zoneDataRaw = $('script[type="text/javascript"]').get()[1].children[0].data.split('\n')[1].slice(121, -3)
+    const zoneDataRaw = $('script[type="text/javascript"]').get()[1].children[0].data.split('\n')[1].slice(120, -3)
     const zoneData = JSON.parse(zoneDataRaw)
 
     // Hardcode taken from Wowhead
