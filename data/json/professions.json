@@ -11,5 +11,6 @@
   { "name": "Leatherworking", "icon": "inv_misc_armorkit_17" },
   { "name": "Skinning", "icon": "inv_misc_pelt_wolf_01" },
   { "name": "Tailoring", "icon": "trade_tailoring" },
-  { "name": "Jewelcrafting", "icon": "inv_misc_gem_01" }
+  { "name": "Jewelcrafting", "icon": "inv_misc_gem_01" },
+  { "name": "Inscription", "icon": "inv_inscription_tradeskill01" }
 ]

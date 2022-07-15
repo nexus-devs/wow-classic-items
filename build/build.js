@@ -369,7 +369,8 @@ class Build {
       165: 'Leatherworking',
       164: 'Blacksmithing',
       129: 'First Aid',
-      755: 'Jewelcrafting'
+      755: 'Jewelcrafting',
+      773: 'Inscription'
     }
 
     const $ = cheerio.load(req.body)
