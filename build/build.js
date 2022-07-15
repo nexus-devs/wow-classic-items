@@ -112,7 +112,7 @@ class Build {
   async scrapeWowheadZones () {
     const zones = []
 
-    const progress = new ProgressBar('Fetching zones', 137)
+    const progress = new ProgressBar('Fetching zones', 193)
     const req = await request({
       url: `${wowheadURL}/zones`,
       json: true
