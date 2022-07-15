@@ -17,6 +17,8 @@ Current content:
 ### Installation
 ```
 npm install wow-classic-items
+or
+yarn add wow-classic-items
 ```
 
 This package is currently laid out for node.js, as this is what we're using in production. However, if you need the database available for another language, simply read in the JSON yourself from `/data/json`
@@ -102,7 +104,7 @@ Note that the actual sell price is not included in the tooltip (just the label),
 
 Install Dependencies:
 ```
-npm install
+yarn
 ```
 
 Create a file called `blizzard_token` in the root directory and add your Blizzard API Access token
@@ -114,17 +116,17 @@ mkdir data/build
 
 Build the item database (default output is `/data/build/data.json`):
 ```
-npm run build
+yarn build
 ```
 The professions database is currently handmade.
 
 After that you can validate the build and/or check the changes between yours and the current one with:
 ```
-npm run validate
+yarn validate
 ```
 Test the item class with:
 ```
-npm test
+yarn test
 ```
 
 <br>
