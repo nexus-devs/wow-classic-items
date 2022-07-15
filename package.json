@@ -33,6 +33,6 @@
     "mocha": "^6.2.2",
     "progress": "^2.0.3",
     "request": "^2.88.0",
-    "requestretry": "^4.0.2"
+    "requestretry": "^7.0.0"
   }
 }
