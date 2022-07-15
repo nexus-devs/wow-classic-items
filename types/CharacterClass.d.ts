@@ -10,4 +10,4 @@ export declare interface CharacterClassSpec {
     icon: string;
 }
 
-export declare type CharacterClassName = 'Druid'|'Hunter'|'Mage'|'Paladin'|'Priest'|'Rogue'|'Shaman'|'Warlock'|'Warrior';
+export declare type CharacterClassName = 'Death Knight'|'Druid'|'Hunter'|'Mage'|'Paladin'|'Priest'|'Rogue'|'Shaman'|'Warlock'|'Warrior';
