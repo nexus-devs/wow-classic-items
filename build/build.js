@@ -5,6 +5,8 @@ const fs = require('fs')
 const path = require('path')
 const colors = require('colors/safe')
 
+const wowheadURL = 'https://wowhead.com/wotlk'
+
 class Build {
   constructor (blizzardToken = 'blizzard_token') {
     this.pipeline = {}
@@ -32,8 +34,6 @@ class Build {
       if (err.code !== 'ENOENT') throw err // Don't throw error if file simply doesn't exist
       else this.warn('Blizzard Token could not be found')
     }
-
-    this.wowheadURL = 'https://wowhead.com/wotlk'
   }
 
   /**
@@ -71,12 +71,12 @@ class Build {
   async scrapeWowheadListing () {
     const items = []
 
-    // Filter the items by ID (total ID range about 40000).
+    // Filter the items by ID (total ID range about 57000).
     const stepSize = 500 // Wowhead can only show about 500 items per page.
-    const progress = new ProgressBar('Fetching base items', 40000 / stepSize)
-    for (let i = 0; i < 40000; i += stepSize) {
+    const progress = new ProgressBar('Fetching base items', 57000 / stepSize)
+    for (let i = 0; i < 57000; i += stepSize) {
       const req = await request({
-        url: `${this.wowheadURL}/items?filter=162:151:151;2:2:5;0:${i}:${i + stepSize}`,
+        url: `${wowheadURL}/items?filter=162:151:151;2:2:5;0:${i}:${i + stepSize}`,
         json: true
       })
 
@@ -114,7 +114,7 @@ class Build {
 
     const progress = new ProgressBar('Fetching zones', 137)
     const req = await request({
-      url: `${this.wowheadURL}/zones`,
+      url: `${wowheadURL}/zones`,
       json: true
     })
 
@@ -167,7 +167,7 @@ class Build {
 
     for (let i = 0; i < 46000; i += stepSize) {
       const req = await request({
-        url: `${this.wowheadURL}/talents?filter=14:14;2:5;${i}:${i + stepSize}`,
+        url: `${wowheadURL}/talents?filter=14:14;2:5;${i}:${i + stepSize}`,
         json: true
       })
 
@@ -206,7 +206,7 @@ class Build {
   async scrapeWowheadTalentsDetail (input) {
     const applyCraftingInfo = async (talent) => {
       const req = await request({
-        url: `${this.wowheadURL}/spell=${talent.id}`,
+        url: `${wowheadURL}/spell=${talent.id}`,
         json: true
       })
 
@@ -299,7 +299,7 @@ class Build {
   async scrapeWowheadDetail (input) {
     const applyCraftingInfo = async (item) => {
       const req = await request({
-        url: `${this.wowheadURL}/item=${item.itemId}`,
+        url: `${wowheadURL}/item=${item.itemId}`,
         json: true
       })
 
@@ -421,7 +421,7 @@ class Build {
     const recipes = []
 
     const req = await request({
-      url: `${this.wowheadURL}/spell=${spellId}`,
+      url: `${wowheadURL}/spell=${spellId}`,
       json: true
     })
 
@@ -737,4 +737,6 @@ class Build {
 }
 
 const build = new Build()
-build.start()
+// build.start()
+// step (pipeline, step, fileOut, fileIn = false)
+build.step('items', 'base_items', 'build/items.json')
