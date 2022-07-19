@@ -17,7 +17,7 @@ class Build {
     // Item pipeline
     this.pipeline.items = [
       { name: 'base_items', fn: this.scrapeWowheadListing },
-      { name: 'item_desc', fn: this.scrapeBlizzardAPI.bind(this) },
+      // { name: 'item_desc', fn: this.scrapeBlizzardAPI.bind(this) },
       { name: 'item_details', fn: this.scrapeWowheadDetail.bind(this) },
       { name: 'unique_names', fn: this.addUniqueNames }
     ]
@@ -459,16 +459,20 @@ class Build {
       q2: 'Uncommon',
       q3: 'Rare',
       q4: 'Epic',
-      q5: 'Legendary'
+      q5: 'Legendary',
+      q9: 'Glyph'
     }
 
     const tooltipRaw = req.body.split('\n').find((line) => line.includes('.tooltip_enus'))
     const tooltipString = tooltipRaw.split(' = ')[1].slice(1, -2)
-    const tooltipStringCleaned = tooltipString.replace(/\\n|(<!--.*?-->)|(<a href=.*?>)|\\/g, '').replace(/(<\/a>)/g, '')
+    const tooltipStringCleaned = tooltipString
+      .replace(/\\n|(<!--.*?-->)|(<a href=.*?>)|\\/g, '')
+      .replace(/(<\/a>)/g, '')
+      .replace(/<br \/>/g, '\n')
 
     const $2 = cheerio.load(tooltipStringCleaned)
     // Get raw labels this way instead of the cool one because cheerio doesn't preserve order
-    const labelsRaw = tooltipStringCleaned.match(/>(.*?)</g).map(s => s.slice(1, -1))
+    const labelsRaw = tooltipStringCleaned.match(/>([\S\s]*?)</g).map(s => s.slice(1, -1))
 
     const doubleCount = {} // Needed to count multiple occurrences (for sets for example)
     let currentlyOnSellprice = false // Needed to remove sell price lines
@@ -737,6 +741,6 @@ class Build {
 }
 
 const build = new Build()
-// build.start()
+build.start()
 // step (pipeline, step, fileOut, fileIn = false)
-build.step('items', 'base_items', 'build/items.json')
+// build.step('items', 'item_details', 'build/item_detail.json', 'build/items.json')
