@@ -1,4 +1,9 @@
-[{"name": "Druid", "color":  "#FF7D0A", "icon": "classicon_druid", "specs": [
+[{"name": "Death Knight", "color":  "#C41E3A", "icon": "class_deathknight", "specs": [
+  { "name": "Blood", "icon": "spell_deathknight_bloodpresence" },
+  { "name": "Frost", "icon": "spell_deathknight_frostpresence" },
+  { "name": "Unholy", "icon": "spell_deathknight_unholypresence" }
+]},
+{"name": "Druid", "color":  "#FF7D0A", "icon": "classicon_druid", "specs": [
   { "name": "Balance", "icon": "spell_nature_starfall" },
   { "name": "Feral", "icon": "ability_druid_catform" },
   { "name": "Bear", "icon": "ability_racial_bearform" },
