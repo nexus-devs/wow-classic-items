@@ -1,7 +1,7 @@
 {
   "name": "wow-classic-items",
-  "version": "1.0.0",
-  "description": "Collection of all WoW Classic and Burning Crusade Classic items.",
+  "version": "2.0.0",
+  "description": "Collection of all WoW Vanilla, TBC and WotLK Classic items.",
   "main": "index.js",
   "scripts": {
     "build": "node ./build/build.js",
