@@ -3,8 +3,8 @@ const ProgressBar = require('./progress')
 const fs = require('fs')
 const path = require('path')
 const colors = require('colors/safe')
-const fetch = require('node-fetch')
 const pLimit = require('p-limit')
+const request = require('requestretry')
 
 const wowheadURL = 'https://wowhead.com/wotlk'
 const blizzardNamespace = 'static-classic-us'
@@ -77,8 +77,10 @@ class Build {
     const stepSize = 500 // Wowhead can only show about 500 items per page.
     const progress = new ProgressBar('Fetching base items', 57000 / stepSize)
     for (let i = 0; i < 57000; i += stepSize) {
-      const request = await fetch(`${wowheadURL}/items?filter=162:151:151;2:2:5;0:${i}:${i + stepSize}`)
-      const req = await request.text()
+      const req = (await request({
+        url: `${wowheadURL}/items?filter=162:151:151;2:2:5;0:${i}:${i + stepSize}`,
+        json: true
+      })).body
 
       // Wowhead uses JavaScript to load in their table content, so we'd need something like Selenium to get the HTML.
       // However, that is really painful and slow. Fortunately, with some parsing the table content is available in the source code.
@@ -115,8 +117,10 @@ class Build {
     const zones = []
 
     const progress = new ProgressBar('Fetching zones', 193)
-    const request = await fetch(`${wowheadURL}/zones`)
-    const req = await request.text()
+    const req = (await request({
+      url: `${wowheadURL}/zones`,
+      json: true
+    })).body
 
     // Wowhead uses JavaScript to load in their table content, so we'd need something like Selenium to get the HTML.
     // However, that is really painful and slow. Fortunately, with some parsing the table content is available in the source code.
@@ -166,8 +170,10 @@ class Build {
     const progress = new ProgressBar('Fetching talents', 46000 / stepSize)
 
     for (let i = 0; i < 46000; i += stepSize) {
-      const request = await fetch(`${wowheadURL}/talents?filter=14:14;2:5;${i}:${i + stepSize}`)
-      const req = await request.text()
+      const req = (await request({
+        url: `${wowheadURL}/talents?filter=14:14;2:5;${i}:${i + stepSize}`,
+        json: true
+      })).body
 
       // Wowhead uses JavaScript to load in their table content, so we'd need something like Selenium to get the HTML.
       // However, that is really painful and slow. Fortunately, with some parsing the table content is available in the source code.
@@ -202,30 +208,28 @@ class Build {
    * Get talent tooltips from wowhead
    */
   async scrapeWowheadTalentsDetail (input) {
+    const limit = pLimit(50)
+    const progress = new ProgressBar('Fetching talent details', input.length)
+
     const applyCraftingInfo = async (talent) => {
-      const request = await fetch(`${wowheadURL}/spell=${talent.id}`)
-      const req = await request.text()
+      const req = (await request({
+        url: `${wowheadURL}/spell=${talent.id}`,
+        json: true
+      })).body
 
       // If you add anything to this, make sure they don't overwrite talent properties from each other
       await Promise.all([
         this.parseWowheadDetailTooltip(req, talent)
       ])
+      progress.tick()
     }
 
-    let parallel = []
-    const batchSize = 200
-    const progress = new ProgressBar('Fetching talent details', (input.length / batchSize) + 1)
+    const parallel = []
     for (let i = 0; i < input.length; i++) {
       const item = input[i]
-      parallel.push(applyCraftingInfo(item))
-      if (parallel.length >= batchSize || i === input.length - 1) {
-        await Promise.all(parallel)
-        progress.tick()
-        parallel = []
-      }
+      parallel.push(limit(() => applyCraftingInfo(item)))
     }
-
-    progress.tick()
+    await Promise.all(parallel)
 
     return input
   }
@@ -242,14 +246,15 @@ class Build {
     }
 
     const items = []
-    const batchSize = 10
-    const limit = pLimit(batchSize)
+    const limit = pLimit(50)
     const progress = new ProgressBar('Fetching item descriptions', input.length)
 
     // Fetch function so we can parallelize it
     const fetchItem = async (item) => {
-      const request = await fetch(`https://us.api.blizzard.com/data/wow/item/${item.itemId}?namespace=${blizzardNamespace}&locale=en_US&access_token=${this.blizzardToken}`)
-      const res = await request.json()
+      const res = (await request({
+        url: `https://us.api.blizzard.com/data/wow/item/${item.itemId}?namespace=${blizzardNamespace}&locale=en_US&access_token=${this.blizzardToken}`,
+        json: true
+      })).body
 
       // Catch unknown error codes or sanitize input if known
       if (res.code) {
@@ -288,9 +293,14 @@ class Build {
    * Scrapes all crafting, tooltip and itemLink related information from Wowhead.
    */
   async scrapeWowheadDetail (input) {
+    const limit = pLimit(50) // If the build silently fails at 'Fetching item details', consider lowering this
+    const progress = new ProgressBar('Fetching item details', input.length + 1)
+
     const applyCraftingInfo = async (item) => {
-      const request = await fetch(`${wowheadURL}/item=${item.itemId}`)
-      const req = await request.text()
+      const req = (await request({
+        url: `${wowheadURL}/item=${item.itemId}`,
+        json: true
+      })).body
 
       // If you add anything to this, make sure they don't overwrite item properties from each other
       await Promise.all([
@@ -301,20 +311,15 @@ class Build {
         this.parseWowheadDetailContentPhase(req, item),
         this.parseWowheadDetailSource(req, item)
       ])
+      progress.tick()
     }
 
-    let parallel = []
-    const batchSize = 50 // If the build silently fails at 'Fetching item details', consider lowering this
-    const progress = new ProgressBar('Fetching item details', (input.length / batchSize) + 1)
+    const parallel = []
     for (let i = 0; i < input.length; i++) {
       const item = input[i]
-      parallel.push(applyCraftingInfo(item))
-      if (parallel.length >= batchSize || i === input.length - 1) {
-        await Promise.all(parallel)
-        progress.tick()
-        parallel = []
-      }
+      parallel.push(limit(() => applyCraftingInfo(item)))
     }
+    await Promise.all(parallel)
 
     // Apply crafting content phase, needs to be done after everything else
     for (const item of input) {
@@ -409,8 +414,10 @@ class Build {
   async parseWowheadDetailCraftingSpell (spellId) {
     const recipes = []
 
-    const request = await fetch(`${wowheadURL}/spell=${spellId}`)
-    const req = await request.text()
+    const req = (await request({
+      url: `${wowheadURL}/spell=${spellId}`,
+      json: true
+    })).body
 
     const $ = cheerio.load(req)
     const tableContentRaw = $('script[type="text/javascript"]').get()
