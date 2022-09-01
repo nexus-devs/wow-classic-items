@@ -1,11 +1,13 @@
-const request = require('requestretry')
 const cheerio = require('cheerio')
 const ProgressBar = require('./progress')
 const fs = require('fs')
 const path = require('path')
 const colors = require('colors/safe')
+const fetch = require('node-fetch')
+const pLimit = require('p-limit')
 
 const wowheadURL = 'https://wowhead.com/wotlk'
+const blizzardNamespace = 'static-classic-us'
 
 class Build {
   constructor (blizzardToken = 'blizzard_token') {
@@ -17,7 +19,7 @@ class Build {
     // Item pipeline
     this.pipeline.items = [
       { name: 'base_items', fn: this.scrapeWowheadListing },
-      // { name: 'item_desc', fn: this.scrapeBlizzardAPI.bind(this) },
+      { name: 'item_desc', fn: this.scrapeBlizzardAPI.bind(this) },
       { name: 'item_details', fn: this.scrapeWowheadDetail.bind(this) },
       { name: 'unique_names', fn: this.addUniqueNames }
     ]
@@ -75,14 +77,12 @@ class Build {
     const stepSize = 500 // Wowhead can only show about 500 items per page.
     const progress = new ProgressBar('Fetching base items', 57000 / stepSize)
     for (let i = 0; i < 57000; i += stepSize) {
-      const req = await request({
-        url: `${wowheadURL}/items?filter=162:151:151;2:2:5;0:${i}:${i + stepSize}`,
-        json: true
-      })
+      const request = await fetch(`${wowheadURL}/items?filter=162:151:151;2:2:5;0:${i}:${i + stepSize}`)
+      const req = await request.text()
 
       // Wowhead uses JavaScript to load in their table content, so we'd need something like Selenium to get the HTML.
       // However, that is really painful and slow. Fortunately, with some parsing the table content is available in the source code.
-      const $ = cheerio.load(req.body)
+      const $ = cheerio.load(req)
 
       const scripts = $('script[type="text/javascript"]').get() // The range 36000-36500 has no data and cause a TypeError, pull scripts out so that we can check whether data exists.
 
@@ -92,7 +92,7 @@ class Build {
 
         for (const key of Object.keys(tableContent)) {
           const item = tableContent[key]
-          if (!item.name_enus.startsWith('QA') {
+          if (!item.name_enus.startsWith('QA')) {
             items.push({
               itemId: parseInt(key),
               name: item.name_enus,
@@ -115,14 +115,12 @@ class Build {
     const zones = []
 
     const progress = new ProgressBar('Fetching zones', 193)
-    const req = await request({
-      url: `${wowheadURL}/zones`,
-      json: true
-    })
+    const request = await fetch(`${wowheadURL}/zones`)
+    const req = await request.text()
 
     // Wowhead uses JavaScript to load in their table content, so we'd need something like Selenium to get the HTML.
     // However, that is really painful and slow. Fortunately, with some parsing the table content is available in the source code.
-    const $ = cheerio.load(req.body)
+    const $ = cheerio.load(req)
     const zoneDataRaw = $('script[type="text/javascript"]').get()[1].children[0].data.split('\n')[1].slice(120, -3)
     const zoneData = JSON.parse(zoneDataRaw)
 
@@ -168,14 +166,12 @@ class Build {
     const progress = new ProgressBar('Fetching talents', 46000 / stepSize)
 
     for (let i = 0; i < 46000; i += stepSize) {
-      const req = await request({
-        url: `${wowheadURL}/talents?filter=14:14;2:5;${i}:${i + stepSize}`,
-        json: true
-      })
+      const request = await fetch(`${wowheadURL}/talents?filter=14:14;2:5;${i}:${i + stepSize}`)
+      const req = await request.text()
 
       // Wowhead uses JavaScript to load in their table content, so we'd need something like Selenium to get the HTML.
       // However, that is really painful and slow. Fortunately, with some parsing the table content is available in the source code.
-      const $ = cheerio.load(req.body)
+      const $ = cheerio.load(req)
 
       // Talents are spells and they have a wide range of ids from about 700-46000. Some steps return no data - check for that
       if ($('script[type="text/javascript"]').get().length > 1) {
@@ -207,10 +203,8 @@ class Build {
    */
   async scrapeWowheadTalentsDetail (input) {
     const applyCraftingInfo = async (talent) => {
-      const req = await request({
-        url: `${wowheadURL}/spell=${talent.id}`,
-        json: true
-      })
+      const request = await fetch(`${wowheadURL}/spell=${talent.id}`)
+      const req = await request.text()
 
       // If you add anything to this, make sure they don't overwrite talent properties from each other
       await Promise.all([
@@ -248,19 +242,19 @@ class Build {
     }
 
     const items = []
+    const batchSize = 10
+    const limit = pLimit(batchSize)
+    const progress = new ProgressBar('Fetching item descriptions', input.length)
 
     // Fetch function so we can parallelize it
     const fetchItem = async (item) => {
-      const req = await request({
-        url: `https://us.api.blizzard.com/data/wow/item/${item.itemId}?namespace=static-2.5.1_38644-classic-us&locale=en_US&access_token=${this.blizzardToken}`,
-        json: true
-      })
-
-      const res = req.body
+      const request = await fetch(`https://us.api.blizzard.com/data/wow/item/${item.itemId}?namespace=${blizzardNamespace}&locale=en_US&access_token=${this.blizzardToken}`)
+      const res = await request.json()
 
       // Catch unknown error codes or sanitize input if known
       if (res.code) {
         if (res.detail !== 'Not Found') this.warn(`Unknown Blizzard Error with code ${res.code} on item ${item.itemId}: ${res.detail}`)
+        progress.tick()
         return
       }
 
@@ -277,20 +271,15 @@ class Build {
       else if (res.inventory_type.type === 'RANGEDRIGHT') item.slot = 'Ranged' // Catch weird edge case
 
       items.push(item)
+      progress.tick()
     }
 
-    let parallel = []
-    const batchSize = 100 // Blizzard throttling limit is 100/s
-    const progress = new ProgressBar('Fetching item descriptions', input.length / batchSize)
+    const parallel = []
     for (let i = 0; i < input.length; i++) {
       const item = input[i]
-      parallel.push(fetchItem(item))
-      if (parallel.length >= batchSize || i === input.length - 1) {
-        await Promise.all(parallel)
-        progress.tick()
-        parallel = []
-      }
+      parallel.push(limit(() => fetchItem(item)))
     }
+    await Promise.all(parallel)
 
     return items
   }
@@ -300,10 +289,8 @@ class Build {
    */
   async scrapeWowheadDetail (input) {
     const applyCraftingInfo = async (item) => {
-      const req = await request({
-        url: `${wowheadURL}/item=${item.itemId}`,
-        json: true
-      })
+      const request = await fetch(`${wowheadURL}/item=${item.itemId}`)
+      const req = await request.text()
 
       // If you add anything to this, make sure they don't overwrite item properties from each other
       await Promise.all([
@@ -377,7 +364,7 @@ class Build {
       773: 'Inscription'
     }
 
-    const $ = cheerio.load(req.body)
+    const $ = cheerio.load(req)
     const tableContentRaw = $('script[type="text/javascript"]').get()
     let foundCreatedBy = false
     for (const contentRaw of tableContentRaw) {
@@ -422,12 +409,10 @@ class Build {
   async parseWowheadDetailCraftingSpell (spellId) {
     const recipes = []
 
-    const req = await request({
-      url: `${wowheadURL}/spell=${spellId}`,
-      json: true
-    })
+    const request = await fetch(`${wowheadURL}/spell=${spellId}`)
+    const req = await request.text()
 
-    const $ = cheerio.load(req.body)
+    const $ = cheerio.load(req)
     const tableContentRaw = $('script[type="text/javascript"]').get()
     for (const contentRaw of tableContentRaw) {
       const content = contentRaw.children.length ? contentRaw.children[0].data : ''
@@ -465,7 +450,7 @@ class Build {
       q9: 'Glyph'
     }
 
-    const tooltipRaw = req.body.split('\n').find((line) => line.includes('.tooltip_enus'))
+    const tooltipRaw = req.split('\n').find((line) => line.includes('.tooltip_enus'))
     const tooltipString = tooltipRaw.split(' = ')[1].slice(1, -2)
     const tooltipStringCleaned = tooltipString
       .replace(/\\n|(<!--.*?-->)|(<a href=.*?>)|\\/g, '')
@@ -540,7 +525,7 @@ class Build {
    * The information is saved in on of the onclicks.
    */
   async parseWowheadDetailItemLink (req, item) {
-    const itemLinkRaw = req.body.split('\n').find((line) => line.includes('onclick="WH.Links.show(this, {&quot;linkColor'))
+    const itemLinkRaw = req.split('\n').find((line) => line.includes('onclick="WH.Links.show(this, {&quot;linkColor'))
     const itemLinkString = itemLinkRaw.split('onclick="WH.Links.show(this, ')[1].slice(0, -26).replace(/&quot;/g, '"')
     const itemLinkData = JSON.parse(itemLinkString)
     item.itemLink = `|c${itemLinkData.linkColor}|H${itemLinkData.linkId}|h[${itemLinkData.linkName}]|h|r`
@@ -551,8 +536,8 @@ class Build {
    * The information is stored as 'Added in content phase x' in the quick facts box.
    */
   async parseWowheadDetailContentPhase (req, item) {
-    const phaseStringPos = req.body.indexOf('content phase ')
-    if (phaseStringPos > -1) item.contentPhase = parseInt(req.body.charAt(phaseStringPos + 14))
+    const phaseStringPos = req.indexOf('content phase ')
+    if (phaseStringPos > -1) item.contentPhase = parseInt(req.charAt(phaseStringPos + 14))
   }
 
   /**
@@ -561,7 +546,7 @@ class Build {
    * Drops are stored inside the 'dropped-by', quests inside the 'reward-from-q' and vendor inside 'sold-by' ListView().
    */
   async parseWowheadDetailSource (req, item) {
-    const $ = cheerio.load(req.body)
+    const $ = cheerio.load(req)
     const tableContentRaw = $('script[type="text/javascript"]').get()
 
     for (const contentRaw of tableContentRaw) {
@@ -665,7 +650,7 @@ class Build {
    * The vendor price is a weighted average of all the infinite stock prices, weighted by popularity
    */
   async parseWowheadDetailVendor (req, item) {
-    const $ = cheerio.load(req.body)
+    const $ = cheerio.load(req)
     const tableContentRaw = $('script[type="text/javascript"]').get()
     for (const contentRaw of tableContentRaw) {
       const content = contentRaw.children.length ? contentRaw.children[0].data : ''
@@ -744,5 +729,3 @@ class Build {
 
 const build = new Build()
 build.start()
-// step (pipeline, step, fileOut, fileIn = false)
-// build.step('items', 'item_details', 'build/item_detail.json', 'build/items.json')
