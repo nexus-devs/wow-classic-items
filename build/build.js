@@ -92,11 +92,13 @@ class Build {
 
         for (const key of Object.keys(tableContent)) {
           const item = tableContent[key]
-          items.push({
-            itemId: parseInt(key),
-            name: item.name_enus,
-            icon: item.icon
-          })
+          if (!item.name_enus.startsWith('QA') {
+            items.push({
+              itemId: parseInt(key),
+              name: item.name_enus,
+              icon: item.icon
+            })
+          }
         }
       }
 
