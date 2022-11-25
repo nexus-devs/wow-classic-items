@@ -5,7 +5,7 @@ import { CharacterClass } from './types/CharacterClass';
 
 declare module 'wow-classic-items' {
   export interface DataBaseOptions {
-    iconSrc: 'blizzard' | 'wowhead';
+    iconSrc: 'blizzard' | 'wowhead' | false;
   }
 
   class DataBase<T> extends Array<T> {}
